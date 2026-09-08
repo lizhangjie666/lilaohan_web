@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --ink: #211c19;
+  --flour: #f5ebdd;
+  --fire: #c84f2f;
+  --lake: #315e68;
+}
+
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--flour); color: var(--ink); font-family: "Source Han Sans SC", "Noto Sans CJK SC", system-ui, sans-serif; }
+body::selection { background: var(--fire); color: white; }
+a, button { -webkit-tap-highlight-color: transparent; }
+img { background: #d9c8b3; }
+
+@layer components {
+  .page-wrap { @apply mx-auto w-full max-w-[1440px] px-5 md:px-10 lg:px-16; }
+  .eyebrow { @apply text-xs font-semibold uppercase tracking-[0.22em] text-fire; }
+  .display-title { @apply font-serif text-4xl font-semibold leading-[1.12] tracking-[-0.02em] md:text-6xl lg:text-7xl; }
+  .section-title { @apply font-serif text-3xl font-semibold leading-tight md:text-5xl; }
+  .body-copy { @apply text-base leading-8 text-charcoal md:text-lg; }
+  .btn-primary { @apply inline-flex min-h-12 items-center justify-center rounded-full bg-fire px-6 py-3 text-base font-semibold text-white transition hover:bg-[#aa3e24] focus:outline-none focus:ring-2 focus:ring-fire focus:ring-offset-4; }
+  .btn-secondary { @apply inline-flex min-h-12 items-center justify-center rounded-full border border-ink/25 bg-flour/90 px-6 py-3 text-base font-semibold text-ink transition hover:border-ink focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-4; }
+  .image-cover { @apply h-full w-full object-cover; }
+  .paper-card { @apply rounded-[1.5rem] border border-ink/10 bg-[#fbf5ec] shadow-[0_16px_50px_rgba(33,28,25,0.07)]; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+}

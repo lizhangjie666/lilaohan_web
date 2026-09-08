@@ -1,0 +1,10 @@
+{
+  "collectionName": "components_diy_steps",
+  "info": { "displayName": "体验步骤" },
+  "attributes": {
+    "title": { "type": "string", "required": true },
+    "description": { "type": "text", "required": true },
+    "image": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "imageAlt": { "type": "string" }
+  }
+}

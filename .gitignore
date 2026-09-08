@@ -1,0 +1,32 @@
+# Dependencies
+**/node_modules/
+
+# Environment and secrets
+**/.env
+**/.env.*
+!**/.env.example
+
+# Build outputs and caches
+**/.nuxt/
+**/.output/
+**/.nitro/
+**/.cache/
+**/dist/
+**/build/
+**/.tmp/
+**/.strapi/
+**/.sites-stage/
+*.tar.gz
+
+# Local uploads and logs
+backend/public/uploads/*
+!backend/public/uploads/.gitkeep
+**/*.log
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
