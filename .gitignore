@@ -15,6 +15,7 @@
 **/build/
 **/.tmp/
 **/.strapi/
+backend/types/generated/
 **/.sites-stage/
 *.tar.gz
 
@@ -29,4 +30,3 @@ backend/public/uploads/*
 .DS_Store
 Thumbs.db
 Desktop.ini
-

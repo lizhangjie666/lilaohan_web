@@ -1,1 +1,37 @@
-{"kind":"singleType","collectionName":"site_settings","info":{"singularName":"site-setting","pluralName":"site-settings","displayName":"全站设置"},"options":{"draftAndPublish":true},"attributes":{"storeName":{"type":"string","required":true,"default":"李老汉窑烤面包"},"heroTitle":{"type":"string","default":"在镇山村，等一炉面包慢慢出炉。"},"heroIntro":{"type":"text"},"heroImage":{"type":"media","multiple":false,"allowedTypes":["images"]},"heroImageAlt":{"type":"string"},"address":{"type":"text","required":true},"hours":{"type":"string"},"phone":{"type":"string","regex":"^[0-9+\\-() ]*$"},"wechat":{"type":"string"},"wechatQr":{"type":"media","multiple":false,"allowedTypes":["images"]},"amapUrl":{"type":"string","regex":"^https?://"},"baiduMapUrl":{"type":"string","regex":"^https?://"},"parking":{"type":"text"},"notice":{"type":"text"},"socialLinks":{"type":"json"},"seo":{"type":"component","component":"shared.seo","repeatable":false}}}
+{
+  "kind": "singleType",
+  "collectionName": "site_settings",
+  "info": {
+    "singularName": "site-setting",
+    "pluralName": "site-settings",
+    "displayName": "官网与照片设置"
+  },
+  "options": { "draftAndPublish": true },
+  "attributes": {
+    "storeName": { "type": "string", "required": true, "default": "李老汉窑烤面包" },
+    "heroTitle": { "type": "string", "default": "在镇山村，等一炉面包慢慢出炉。" },
+    "heroIntro": { "type": "text" },
+    "heroImage": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "heroImageAlt": { "type": "string" },
+    "homeFireImage": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "homeFireImageAlt": { "type": "string" },
+    "menuHeroImage": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "menuHeroImageAlt": { "type": "string" },
+    "diyHeroImage": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "diyHeroImageAlt": { "type": "string" },
+    "guideHeroImage": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "guideHeroImageAlt": { "type": "string" },
+    "address": { "type": "text", "required": true },
+    "hours": { "type": "string" },
+    "phone": { "type": "string", "regex": "^[0-9+\\-() ]*$" },
+    "wechat": { "type": "string" },
+    "wechatQr": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "wechatQrAlt": { "type": "string" },
+    "amapUrl": { "type": "string", "regex": "^https?://" },
+    "baiduMapUrl": { "type": "string", "regex": "^https?://" },
+    "parking": { "type": "text" },
+    "notice": { "type": "text" },
+    "socialLinks": { "type": "json" },
+    "seo": { "type": "component", "component": "shared.seo", "repeatable": false }
+  }
+}

@@ -1,1 +1,24 @@
-{"kind":"singleType","collectionName":"stories","info":{"singularName":"story","pluralName":"stories","displayName":"品牌故事"},"options":{"draftAndPublish":true},"attributes":{"originTitle":{"type":"string"},"origin":{"type":"richtext","required":true},"philosophy":{"type":"richtext"},"process":{"type":"json"},"teamIntro":{"type":"richtext"},"gallery":{"type":"media","multiple":true,"allowedTypes":["images"]},"visible":{"type":"boolean","default":true},"seo":{"type":"component","component":"shared.seo","repeatable":false}}}
+{
+  "kind": "singleType",
+  "collectionName": "stories",
+  "info": {
+    "singularName": "story",
+    "pluralName": "stories",
+    "displayName": "品牌故事"
+  },
+  "options": { "draftAndPublish": true },
+  "attributes": {
+    "originTitle": { "type": "string" },
+    "origin": { "type": "richtext", "required": true },
+    "philosophy": { "type": "richtext" },
+    "process": { "type": "json" },
+    "teamIntro": { "type": "richtext" },
+    "heroImage": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "heroImageAlt": { "type": "string" },
+    "teamImage": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "teamImageAlt": { "type": "string" },
+    "gallery": { "type": "media", "multiple": true, "allowedTypes": ["images"] },
+    "visible": { "type": "boolean", "default": true },
+    "seo": { "type": "component", "component": "shared.seo", "repeatable": false }
+  }
+}

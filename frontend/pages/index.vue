@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { images } from '~/data/fallback'
-
 const { products, tutorials, spots, settings } = useContent()
 const [{ data: productList }, { data: tutorialList }, { data: spotList }, { data: site }] = await Promise.all([
   useAsyncData('home-products', products), useAsyncData('home-tutorials', tutorials), useAsyncData('home-spots', spots), useAsyncData('home-settings', settings),
@@ -14,15 +12,15 @@ useHead({ script: [{ type: 'application/ld+json', innerHTML: JSON.stringify({ '@
 <template>
   <div>
     <section class="relative isolate min-h-[82vh] overflow-hidden bg-ink text-white">
-      <img src="/images/home-hero.jpg" alt="李老汉窑烤面包店内庭院与窑炉" class="absolute inset-0 -z-20 h-full w-full object-cover object-[55%_48%]" fetchpriority="high">
+      <img :src="site?.heroImage" :alt="site?.heroImageAlt" class="absolute inset-0 -z-20 h-full w-full object-cover object-[55%_48%]" fetchpriority="high">
       <div class="absolute inset-0 -z-10 bg-gradient-to-r from-ink/90 via-ink/55 to-ink/10" />
       <div class="page-wrap flex min-h-[82vh] items-end py-16 md:py-24">
-        <div class="max-w-3xl"><p class="text-xs font-semibold tracking-[0.24em] text-[#ff9b78]">GUIYANG · ZHENSHAN VILLAGE</p><h1 class="mt-6 font-serif text-5xl font-semibold leading-[1.08] md:text-7xl lg:text-[5.6rem]">在镇山村，<br>等一炉面包慢慢出炉。</h1><p class="mt-7 max-w-xl text-base leading-8 text-white/75 md:text-lg">柴火、面团与村子的慢时间。来吃一口刚出炉，也亲手做一份带走。</p><div class="mt-9 flex flex-wrap gap-3"><NuxtLink to="/menu" class="btn-primary">看看今天吃什么</NuxtLink><NuxtLink to="/visit" class="btn-secondary border-white/30 bg-white/10 text-white backdrop-blur">导航到店</NuxtLink></div></div>
+        <div class="max-w-3xl"><p class="text-xs font-semibold tracking-[0.24em] text-[#ff9b78]">GUIYANG · ZHENSHAN VILLAGE</p><h1 class="mt-6 font-serif text-5xl font-semibold leading-[1.08] md:text-7xl lg:text-[5.6rem]">{{ site?.heroTitle }}</h1><p class="mt-7 max-w-xl text-base leading-8 text-white/75 md:text-lg">{{ site?.heroIntro }}</p><div class="mt-9 flex flex-wrap gap-3"><NuxtLink to="/menu" class="btn-primary">看看今天吃什么</NuxtLink><NuxtLink to="/visit" class="btn-secondary border-white/30 bg-white/10 text-white backdrop-blur">导航到店</NuxtLink></div></div>
       </div>
     </section>
 
     <section class="page-wrap py-20 md:py-32">
-      <div class="grid items-center gap-12 md:grid-cols-2"><div class="relative"><div class="aspect-[4/5] overflow-hidden rounded-[2rem]"><img :src="images.fire" alt="砖窑火焰氛围示意图" class="image-cover" loading="lazy"></div><span class="absolute -bottom-5 -right-2 grid h-28 w-28 rotate-6 place-items-center rounded-full bg-fire px-4 text-center font-serif text-lg text-white md:right-8">一炉火<br>一整天</span></div><div><p class="eyebrow">01 · 看见一炉火</p><h2 class="section-title mt-5">不是追求快，<br>是把火候交给时间。</h2><p class="body-copy mt-7">添柴、看火、等待。窑炉里的高温让面包和披萨长出微焦的边，也让每一次出炉都有一点不同。我们把制作过程留在你看得见的地方。</p><NuxtLink to="/story" class="mt-8 inline-block border-b border-ink pb-1 font-semibold">认识我们的窑炉 →</NuxtLink></div></div>
+      <div class="grid items-center gap-12 md:grid-cols-2"><div class="relative"><div class="aspect-[4/5] overflow-hidden rounded-[2rem]"><img :src="site?.homeFireImage" :alt="site?.homeFireImageAlt" class="image-cover" loading="lazy"></div><span class="absolute -bottom-5 -right-2 grid h-28 w-28 rotate-6 place-items-center rounded-full bg-fire px-4 text-center font-serif text-lg text-white md:right-8">一炉火<br>一整天</span></div><div><p class="eyebrow">01 · 看见一炉火</p><h2 class="section-title mt-5">不是追求快，<br>是把火候交给时间。</h2><p class="body-copy mt-7">添柴、看火、等待。窑炉里的高温让面包和披萨长出微焦的边，也让每一次出炉都有一点不同。我们把制作过程留在你看得见的地方。</p><NuxtLink to="/story" class="mt-8 inline-block border-b border-ink pb-1 font-semibold">认识我们的窑炉 →</NuxtLink></div></div>
     </section>
 
     <section class="bg-ink py-20 text-flour md:py-28">

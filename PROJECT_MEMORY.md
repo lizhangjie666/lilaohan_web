@@ -1,6 +1,6 @@
 # 项目记忆：李老汉窑烤面包官网
 
-更新时间：2026-09-08
+更新时间：2026-09-09
 
 ## 1. 项目目标
 
@@ -15,7 +15,8 @@
 - `frontend/`：Nuxt 3、Vue 3、TypeScript、Tailwind CSS
 - `backend/`：Strapi 5、TypeScript、PostgreSQL
 - 前后端通过 Strapi REST API 分离
-- 前端在 Strapi 不可用或没有已发布数据时，会使用 `frontend/data/fallback.ts` 中的安全兜底内容
+- 前端使用 Node SSR 动态读取 Strapi；后台发布后，官网下一次访问即可读取新内容
+- 只有开发环境在 Strapi 不可用时使用 `frontend/data/fallback.ts` 的演示内容；生产环境返回安全空状态，不回填虚构菜单
 - 正式媒体存储计划使用阿里云 OSS 或腾讯云 COS
 - 地图使用高德/百度导航链接，不直接嵌入地图
 
@@ -36,12 +37,12 @@
 
 Strapi 已建立以下内容类型，并启用草稿/发布：
 
-- `SiteSettings`：店名、首页内容、地址、营业时间、电话、微信、二维码、地图及社交账号
+- `SiteSettings`：店名、首页内容、各页面主图、地址、营业时间、电话、微信、二维码、地图及社交账号
 - `ProductCategory`：产品分类、说明、排序和显示状态
-- `Product`：名称、分类、介绍、价格、标签、供应状态、推荐状态、图片和SEO
-- `DIYTutorial`：类型、时长、人数、材料、步骤、注意事项、图片和SEO
+- `Product`：名称、分类、介绍、价格、可重复标签、供应状态、推荐状态、图片和SEO
+- `DIYTutorial`：类型、时长、人数、可重复材料、图文步骤、注意事项、演示视频链接、图片和SEO
 - `PhotoSpot`：机位、最佳时间、步行提示、拍摄建议、图片和导航链接
-- `Story`：品牌起源、理念、制作过程、团队与图库
+- `Story`：品牌起源、理念、制作过程、故事主图、团队图片与图库
 - `Notice`：营业调整、节假日、新品和一般公告
 - `FAQ`：到店、DIY、产品和其他常见问题
 
@@ -85,7 +86,7 @@ Strapi 已建立以下内容类型，并启用草稿/发布：
 
 - 前端开发：在 `frontend/` 运行 `npm run dev`
 - 前端验证：在 `frontend/` 运行 `npm run build`
-- 前端静态输出：`frontend/.output/public`
+- 前端生产服务：构建后运行 `node frontend/.output/server/index.mjs`
 - 后台开发：在 `backend/` 配置 PostgreSQL 后运行 `npm run develop`
 - 后台验证：在 `backend/` 运行 `npm run build`
 - 环境变量模板：`frontend/.env.example` 与 `backend/.env.example`
@@ -95,7 +96,7 @@ Strapi 已建立以下内容类型，并启用草稿/发布：
 
 `https://lilaohan-wood-fired-bakery.hann52265.chatgpt.site`
 
-Sites 项目标识保存在 `frontend/.openai/hosting.json`，必须复用现有 `project_id`，不可为同一官网重复创建站点。发布新版本前先完成生产构建；不要改变站点访问范围，除非店主明确要求公开。
+Sites 项目标识保存在 `frontend/.openai/hosting.json`，必须复用现有 `project_id`，不可为同一官网重复创建站点。该地址只保留为临时静态版本，不能覆盖为当前需要常驻 Nuxt 与 Strapi 的动态构建；正式动态站使用根目录 Docker Compose 部署到服务器后再切换域名。
 
 ## 9. 开发约束
 
@@ -107,3 +108,16 @@ Sites 项目标识保存在 `frontend/.openai/hosting.json`，必须复用现有
 - 不在仓库、记忆文件或用户可见输出中保存数据库密码、API令牌或部署凭据
 - 修改网站后至少运行对应生产构建；发布时复用原站点并保持私有访问，除非用户另有要求
 - 所有 Git 提交说明必须使用中文；推送前检查提交信息，不使用英文提交说明
+
+## 10. 后台语言与账号角色
+
+- Strapi 日常运营后台默认使用简体中文（`zh-Hans`）
+- 产品、分类、DIY教程、打卡机位、公告、常见问题、全站设置和品牌故事的后台字段标签均显示中文，但 REST API 字段名继续使用英文
+- “内容编辑”角色只管理上述门店内容和媒体文件，不开放接口令牌、插件、角色权限及内容模型等技术设置
+- 超级管理员保留完整系统权限；新增店员时应分配“内容编辑”角色
+- 新建后台账号默认使用简体中文，已有后台账号在启动时统一切换到简体中文
+- Strapi 升级后需要重新检查内容管理、发布流程和媒体库的中文显示是否完整
+- 菜单产品支持新增、查看、修改、删除、隐藏、排序、草稿及发布，分类为必填关系
+- 手作体验的演示视频使用完整 `https://` 外链；链接为空时前端不显示播放入口
+- 首页、菜单、DIY、打卡指南、品牌故事、教程步骤、菜单产品和微信二维码的图片均可在后台媒体库替换
+- 生产环境采用 Nuxt、Strapi、PostgreSQL 与 Caddy 的 Docker 分离部署；上传目录和数据库必须持续备份

@@ -6,6 +6,7 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss'],
   css: ['~/assets/css/main.css'],
   runtimeConfig: {
+    strapiUrl: process.env.STRAPI_URL || process.env.NUXT_PUBLIC_STRAPI_URL || 'http://localhost:1337',
     public: {
       strapiUrl: process.env.NUXT_PUBLIC_STRAPI_URL || 'http://localhost:1337',
       phone: process.env.NUXT_PUBLIC_PHONE || '',
@@ -23,12 +24,5 @@ export default defineNuxtConfig({
       ],
     },
   },
-  routeRules: {
-    '/': { prerender: true },
-    '/menu': { prerender: true },
-    '/diy': { prerender: true },
-    '/guide': { prerender: true },
-    '/story': { prerender: true },
-    '/visit': { prerender: true },
-  },
+  nitro: { preset: 'node-server' },
 })

@@ -1,1 +1,30 @@
-{"kind":"collectionType","collectionName":"diy_tutorials","info":{"singularName":"diy-tutorial","pluralName":"diy-tutorials","displayName":"DIY教程"},"options":{"draftAndPublish":true},"attributes":{"title":{"type":"string","required":true},"slug":{"type":"uid","targetField":"title","required":true},"type":{"type":"string","required":true},"summary":{"type":"text","required":true},"duration":{"type":"string"},"people":{"type":"string"},"materials":{"type":"json"},"steps":{"type":"component","component":"diy.step","repeatable":true,"required":true},"notes":{"type":"json"},"consultationTip":{"type":"text"},"image":{"type":"media","multiple":false,"required":true,"allowedTypes":["images"]},"imageAlt":{"type":"string","required":true},"visible":{"type":"boolean","default":true},"sortOrder":{"type":"integer","default":0},"seo":{"type":"component","component":"shared.seo","repeatable":false}}}
+{
+  "kind": "collectionType",
+  "collectionName": "diy_tutorials",
+  "info": {
+    "singularName": "diy-tutorial",
+    "pluralName": "diy-tutorials",
+    "displayName": "手作体验",
+    "description": "管理面包和披萨手作体验"
+  },
+  "options": { "draftAndPublish": true },
+  "attributes": {
+    "title": { "type": "string", "required": true },
+    "slug": { "type": "uid", "targetField": "title", "required": true },
+    "type": { "type": "string", "required": true },
+    "summary": { "type": "text", "required": true },
+    "duration": { "type": "string" },
+    "people": { "type": "string" },
+    "materials": { "type": "component", "component": "shared.text-item", "repeatable": true },
+    "steps": { "type": "component", "component": "diy.step", "repeatable": true, "required": true },
+    "notes": { "type": "component", "component": "shared.text-item", "repeatable": true },
+    "consultationTip": { "type": "text" },
+    "videoUrl": { "type": "string", "regex": "^https://.+" },
+    "videoLabel": { "type": "string", "default": "观看演示视频" },
+    "image": { "type": "media", "multiple": false, "required": true, "allowedTypes": ["images"] },
+    "imageAlt": { "type": "string", "required": true },
+    "visible": { "type": "boolean", "default": true },
+    "sortOrder": { "type": "integer", "default": 0 },
+    "seo": { "type": "component", "component": "shared.seo", "repeatable": false }
+  }
+}
