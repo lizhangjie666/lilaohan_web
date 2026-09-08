@@ -167,6 +167,51 @@ function applyFieldTexts(configuration: any, fields: ModelLocalization) {
   return { ...configuration, metadatas };
 }
 
+function restoreMissingLayoutFields(configuration: any, fields: ModelLocalization, model: any) {
+  const layouts = { ...(configuration.layouts ?? {}) };
+  const attributes = model.attributes ?? {};
+  const currentEdit = Array.isArray(layouts.edit)
+    ? layouts.edit
+        .map((row: any[]) => row.filter((cell: any) => attributes[cell.name]))
+        .filter((row: any[]) => row.length)
+    : [];
+  const fieldsInLayout = new Set(
+    currentEdit.flatMap((row: any[]) => row.map((cell: any) => cell.name)),
+  );
+  const missing = Object.keys(fields).filter(
+    (fieldName) => attributes[fieldName] && !fieldsInLayout.has(fieldName),
+  );
+  const required = missing.filter((fieldName) => attributes[fieldName].required);
+  const optional = missing.filter((fieldName) => !attributes[fieldName].required);
+  const makeRows = (fieldNames: string[]) =>
+    fieldNames.map((fieldName) => {
+      const attribute = attributes[fieldName];
+      const fullWidth =
+        ['text', 'richtext', 'json', 'blocks'].includes(attribute.type) ||
+        (attribute.type === 'component' && attribute.repeatable);
+      return [{ name: fieldName, size: fullWidth ? 12 : 6 }];
+    });
+
+  const mainField = configuration.settings?.mainField;
+  const currentList = Array.isArray(layouts.list)
+    ? layouts.list.filter((fieldName: string) => fieldName === 'id' || attributes[fieldName])
+    : [];
+  const list =
+    mainField && attributes[mainField] && !currentList.includes(mainField)
+      ? [mainField, ...currentList.filter((fieldName: string) => fieldName !== 'id')]
+      : currentList;
+
+  return {
+    ...configuration,
+    layouts: {
+      ...layouts,
+      list,
+      // 必填字段放在最前方，避免旧布局隐藏字段后只能看到笼统的发布错误。
+      edit: [...makeRows(required), ...currentEdit, ...makeRows(optional)],
+    },
+  };
+}
+
 export function registerChineseAdminDefaults(strapi: Core.Strapi) {
   // 新建后台账号时默认使用简体中文，仍允许用户之后在个人设置中修改。
   strapi.db.lifecycles.subscribe({
@@ -193,7 +238,11 @@ export async function localizeAdminContent(strapi: Core.Strapi) {
 
     const current = await contentTypeService.findConfiguration(model);
     const { uid: _uid, ...configuration } = current;
-    await contentTypeService.updateConfiguration(model, applyFieldTexts(configuration, fields));
+    const localized = applyFieldTexts(configuration, fields);
+    await contentTypeService.updateConfiguration(
+      model,
+      restoreMissingLayoutFields(localized, fields, model),
+    );
   }
 
   for (const [uid, fields] of Object.entries(componentLocalizations)) {

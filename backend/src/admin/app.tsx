@@ -68,6 +68,8 @@ const zhHansTranslations: Record<string, string> = {
   'content-manager.containers.List.statusFilter.published': '已发布',
   'content-manager.containers.List.statusFilter.publishedModified': '已发布且有修改',
   'content-manager.containers.List.statusFilter.publishedUnmodified': '已发布且无修改',
+  'content-manager.validation.error': '内容中有未填写或格式不正确的字段，请根据红色提示修正后再保存或发布。',
+  'content-manager.validation.error.unreadable-required-field': '当前账号无权查看部分必填字段，请联系管理员调整权限。',
   'upload.assets.uploaded': '已成功上传 {number} 个文件',
   'upload.asset-details.title': '文件详情',
   'upload.asset-details.description': '查看和修改图片或文件信息',
