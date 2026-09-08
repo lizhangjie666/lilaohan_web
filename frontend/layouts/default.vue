@@ -17,7 +17,7 @@ const nav = [
     <header class="sticky top-0 z-50 border-b border-ink/10 bg-flour/95 backdrop-blur">
       <div class="page-wrap flex h-18 items-center justify-between py-3">
         <NuxtLink to="/" class="group flex items-center gap-3" aria-label="返回首页">
-          <span class="grid h-11 w-11 place-items-center rounded-full bg-ink font-serif text-lg text-flour transition group-hover:bg-fire">李</span>
+          <img src="/images/brand-avatar.jpg" alt="李老汉窑烤面包头像" class="h-11 w-11 rounded-full border border-ink/10 object-cover transition group-hover:scale-105">
           <span><b class="block font-serif text-lg leading-none">李老汉窑烤面包</b><small class="mt-1 block text-[11px] tracking-[0.18em] text-charcoal">ZHENSHAN · GUIYANG</small></span>
         </NuxtLink>
         <nav class="hidden items-center gap-7 lg:flex" aria-label="主导航">
@@ -49,4 +49,3 @@ const nav = [
     </div>
   </div>
 </template>
-
