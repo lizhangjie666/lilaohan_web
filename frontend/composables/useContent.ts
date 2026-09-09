@@ -61,9 +61,9 @@ function mediaUrl(value: any, base = ''): string {
   return base ? `${base}${media.url.startsWith('/') ? '' : '/'}${media.url}` : media.url
 }
 
-function mediaAlt(value: any, provided = ''): string {
+function mediaAlt(value: any): string {
   const media = unwrapMedia(value)
-  return provided || String(media.alternativeText || media.caption || '')
+  return String(media.alternativeText || media.caption || '')
 }
 
 function textItems(value: any): string[] {
@@ -87,7 +87,7 @@ function normalizeProduct(entity: Entity, mediaBase = ''): Product {
     available: item.available !== false,
     featured: item.featured === true,
     image: mediaUrl(item.image, mediaBase),
-    imageAlt: mediaAlt(item.image, String(item.imageAlt || '')),
+    imageAlt: mediaAlt(item.image) || String(item.name || '菜单产品图片'),
   }
 }
 
@@ -96,7 +96,7 @@ function normalizeStep(value: RawRecord, mediaBase = ''): TutorialStep {
     title: String(value.title || ''),
     description: String(value.description || ''),
     image: mediaUrl(value.image, mediaBase) || undefined,
-    imageAlt: mediaAlt(value.image, String(value.imageAlt || '')) || undefined,
+    imageAlt: mediaAlt(value.image) || String(value.title || '手作步骤图片'),
   }
 }
 
@@ -114,7 +114,7 @@ function normalizeTutorial(entity: Entity, mediaBase = ''): Tutorial {
     steps: Array.isArray(item.steps) ? item.steps.map((step: RawRecord) => normalizeStep(step, mediaBase)) : [],
     notes: textItems(item.notes),
     image: mediaUrl(item.image, mediaBase),
-    imageAlt: mediaAlt(item.image, String(item.imageAlt || '')),
+    imageAlt: mediaAlt(item.image) || String(item.title || '手作体验图片'),
     videoUrl: typeof item.videoUrl === 'string' && item.videoUrl.startsWith('https://') ? item.videoUrl : undefined,
     videoLabel: String(item.videoLabel || '观看演示视频'),
   }
@@ -131,7 +131,7 @@ function normalizeSpot(entity: Entity, mediaBase = ''): PhotoSpot {
     walk: String(item.walk || ''),
     direction: String(item.direction || ''),
     image: mediaUrl(item.image, mediaBase),
-    imageAlt: mediaAlt(item.image, String(item.imageAlt || '')),
+    imageAlt: mediaAlt(item.image) || String(item.name || '镇山村打卡图片'),
     mapUrl: String(item.mapUrl || ''),
   }
 }
@@ -139,8 +139,7 @@ function normalizeSpot(entity: Entity, mediaBase = ''): PhotoSpot {
 function normalizeSettings(entity: Entity, mediaBase = ''): SiteSettings {
   const item = flatten(entity)
   const image = (key: string, fallback: string) => mediaUrl(item[key], mediaBase) || fallback
-  const alt = (key: string, imageKey: string, fallback: string) =>
-    mediaAlt(item[imageKey], String(item[key] || '')) || fallback
+  const alt = (imageKey: string, fallback: string) => mediaAlt(item[imageKey]) || fallback
 
   return {
     ...emptySettings,
@@ -148,21 +147,21 @@ function normalizeSettings(entity: Entity, mediaBase = ''): SiteSettings {
     heroTitle: String(item.heroTitle || emptySettings.heroTitle),
     heroIntro: String(item.heroIntro || emptySettings.heroIntro),
     heroImage: image('heroImage', emptySettings.heroImage),
-    heroImageAlt: alt('heroImageAlt', 'heroImage', emptySettings.heroImageAlt),
+    heroImageAlt: alt('heroImage', emptySettings.heroImageAlt),
     homeFireImage: image('homeFireImage', emptySettings.homeFireImage),
-    homeFireImageAlt: alt('homeFireImageAlt', 'homeFireImage', emptySettings.homeFireImageAlt),
+    homeFireImageAlt: alt('homeFireImage', emptySettings.homeFireImageAlt),
     menuHeroImage: image('menuHeroImage', emptySettings.menuHeroImage),
-    menuHeroImageAlt: alt('menuHeroImageAlt', 'menuHeroImage', emptySettings.menuHeroImageAlt),
+    menuHeroImageAlt: alt('menuHeroImage', emptySettings.menuHeroImageAlt),
     diyHeroImage: image('diyHeroImage', emptySettings.diyHeroImage),
-    diyHeroImageAlt: alt('diyHeroImageAlt', 'diyHeroImage', emptySettings.diyHeroImageAlt),
+    diyHeroImageAlt: alt('diyHeroImage', emptySettings.diyHeroImageAlt),
     guideHeroImage: image('guideHeroImage', emptySettings.guideHeroImage),
-    guideHeroImageAlt: alt('guideHeroImageAlt', 'guideHeroImage', emptySettings.guideHeroImageAlt),
+    guideHeroImageAlt: alt('guideHeroImage', emptySettings.guideHeroImageAlt),
     address: String(item.address || emptySettings.address),
     hours: String(item.hours || emptySettings.hours),
     phone: String(item.phone || ''),
     wechat: String(item.wechat || ''),
     wechatQr: mediaUrl(item.wechatQr, mediaBase),
-    wechatQrAlt: alt('wechatQrAlt', 'wechatQr', emptySettings.wechatQrAlt),
+    wechatQrAlt: alt('wechatQr', emptySettings.wechatQrAlt),
     amapUrl: String(item.amapUrl || ''),
     baiduMapUrl: String(item.baiduMapUrl || ''),
     parking: String(item.parking || emptySettings.parking),
@@ -190,10 +189,15 @@ function normalizeStory(entity: Entity, mediaBase = ''): Story {
     process,
     teamIntro: String(item.teamIntro || emptyStory.teamIntro),
     heroImage: mediaUrl(item.heroImage, mediaBase) || emptyStory.heroImage,
-    heroImageAlt: mediaAlt(item.heroImage, String(item.heroImageAlt || '')) || emptyStory.heroImageAlt,
+    heroImageAlt: mediaAlt(item.heroImage) || emptyStory.heroImageAlt,
     teamImage: mediaUrl(item.teamImage, mediaBase) || emptyStory.teamImage,
-    teamImageAlt: mediaAlt(item.teamImage, String(item.teamImageAlt || '')) || emptyStory.teamImageAlt,
-    gallery: galleryItems.map((media: any) => ({ url: mediaUrl(media, mediaBase), alt: mediaAlt(media) })).filter((media: { url: string }) => media.url),
+    teamImageAlt: mediaAlt(item.teamImage) || emptyStory.teamImageAlt,
+    gallery: galleryItems
+      .map((media: any, index: number) => ({
+        url: mediaUrl(media, mediaBase),
+        alt: mediaAlt(media) || `李老汉窑烤面包故事图片 ${index + 1}`,
+      }))
+      .filter((media: { url: string }) => media.url),
   }
 }
 

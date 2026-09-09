@@ -26,7 +26,6 @@
     "visible": { "type": "boolean", "default": true },
     "sortOrder": { "type": "integer", "default": 0 },
     "image": { "type": "media", "multiple": false, "required": true, "allowedTypes": ["images"] },
-    "imageAlt": { "type": "string", "required": true },
     "seo": { "type": "component", "component": "shared.seo", "repeatable": false }
   }
 }

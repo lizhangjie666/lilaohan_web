@@ -14,9 +14,7 @@
     "process": { "type": "json" },
     "teamIntro": { "type": "richtext" },
     "heroImage": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
-    "heroImageAlt": { "type": "string" },
     "teamImage": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
-    "teamImageAlt": { "type": "string" },
     "gallery": { "type": "media", "multiple": true, "allowedTypes": ["images"] },
     "visible": { "type": "boolean", "default": true },
     "seo": { "type": "component", "component": "shared.seo", "repeatable": false }

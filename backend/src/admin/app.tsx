@@ -83,6 +83,8 @@ const zhHansTranslations: Record<string, string> = {
   'upload.asset-details.fileName': '文件名',
   'upload.asset-details.caption': '图片说明',
   'upload.asset-details.alternativeText': '替代文字',
+  'upload.form.input.label.file-alt': '替代文字',
+  'upload.form.input.description.file-alt': '用于搜索引擎和无障碍阅读，不会直接显示在页面上。',
   'upload.asset-details.location': '所在文件夹',
   'upload.asset-details.save': '保存修改',
   'upload.asset-details.update.success': '文件已更新',
