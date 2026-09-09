@@ -10,6 +10,8 @@ export const images = {
 
 export const fallbackSettings: SiteSettings = {
   storeName: '李老汉窑烤面包',
+  brandLogo: '/images/brand-avatar.jpg',
+  brandLogoAlt: '李老汉窑烤面包品牌头像',
   heroTitle: '在镇山村，等一炉面包慢慢出炉。',
   heroIntro: '柴火、面团与村子的慢时间。来吃一口刚出炉，也亲手做一份带走。',
   heroImage: '/images/home-hero.jpg',

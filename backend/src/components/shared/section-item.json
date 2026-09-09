@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_shared_section_items",
+  "info": {
+    "displayName": "板块小项",
+    "description": "用于页面板块中的说明卡片"
+  },
+  "attributes": {
+    "eyebrow": { "type": "string" },
+    "title": { "type": "string", "required": true },
+    "text": { "type": "text" },
+    "representativeProduct": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::product.product"
+    },
+    "image": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "buttonText": { "type": "string" },
+    "buttonLink": { "type": "string" }
+  }
+}

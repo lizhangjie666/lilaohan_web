@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "page_sections",
+  "info": {
+    "singularName": "page-section",
+    "pluralName": "page-sections",
+    "displayName": "页面板块",
+    "description": "管理官网各个固定板块的文字、按钮和图片"
+  },
+  "options": { "draftAndPublish": true },
+  "attributes": {
+    "sectionName": { "type": "string", "required": true },
+    "pageKey": { "type": "string", "required": true },
+    "sectionKey": { "type": "string", "required": true, "unique": true },
+    "eyebrow": { "type": "string" },
+    "title": { "type": "string" },
+    "description": { "type": "text" },
+    "image": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "primaryButtonText": { "type": "string" },
+    "primaryButtonLink": { "type": "string" },
+    "secondaryButtonText": { "type": "string" },
+    "secondaryButtonLink": { "type": "string" },
+    "items": { "type": "component", "component": "shared.section-item", "repeatable": true },
+    "visible": { "type": "boolean", "default": true },
+    "sortOrder": { "type": "integer", "default": 0 }
+  }
+}

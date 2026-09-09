@@ -49,8 +49,17 @@ export interface PhotoSpot {
   mapUrl: string
 }
 
+export interface FAQ {
+  id: number
+  question: string
+  answer: string
+  category: string
+}
+
 export interface SiteSettings {
   storeName: string
+  brandLogo: string
+  brandLogoAlt: string
   heroTitle: string
   heroIntro: string
   heroImage: string
@@ -92,4 +101,32 @@ export interface Story {
   teamImage: string
   teamImageAlt: string
   gallery: Array<{ url: string; alt: string }>
+}
+
+export interface PageSectionItem {
+  eyebrow?: string
+  title: string
+  text?: string
+  image?: string
+  imageAlt?: string
+  buttonText?: string
+  buttonLink?: string
+}
+
+export interface PageSection {
+  sectionName: string
+  pageKey: string
+  sectionKey: string
+  eyebrow: string
+  title: string
+  description: string
+  image: string
+  imageAlt: string
+  primaryButtonText: string
+  primaryButtonLink: string
+  secondaryButtonText: string
+  secondaryButtonLink: string
+  items: PageSectionItem[]
+  visible: boolean
+  sortOrder: number
 }

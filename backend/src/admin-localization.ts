@@ -81,6 +81,7 @@ const contentTypeLocalizations: Record<string, ModelLocalization> = {
   },
   'api::site-setting.site-setting': {
     storeName: { label: '店铺名称' },
+    brandLogo: { label: '网站头像与品牌图标' },
     heroTitle: { label: '首页主标题' },
     heroIntro: { label: '首页引言' },
     heroImage: { label: '首页主图' },
@@ -112,6 +113,22 @@ const contentTypeLocalizations: Record<string, ModelLocalization> = {
     visible: { label: '官网显示' },
     seo: { label: '搜索展示设置' },
   },
+  'api::page-section.page-section': {
+    sectionName: { label: '板块名称', description: '方便在后台识别，官网不会直接显示这个名称。' },
+    pageKey: { label: '所属页面', description: '系统识别字段，请勿修改。' },
+    sectionKey: { label: '板块编号', description: '用于连接前端板块，请勿修改或删除。' },
+    eyebrow: { label: '上方小标题' },
+    title: { label: '主标题' },
+    description: { label: '展示文字 / 简短说明', description: '联系引导和页脚板块中，这里就是页面上显示的整段说明文字，支持换行。' },
+    image: { label: '板块图片', description: '上传后会替换该板块原有图片；不上传则保留当前默认图片。' },
+    primaryButtonText: { label: '主按钮文字' },
+    primaryButtonLink: { label: '主按钮链接', description: '可填写 /menu 这类站内地址或完整 https:// 地址。' },
+    secondaryButtonText: { label: '次按钮文字' },
+    secondaryButtonLink: { label: '次按钮链接' },
+    items: { label: '板块小项 / 品类卡片', description: '首页招牌菜单可在这里维护多个品类卡片；每项可填写图片、名称、介绍和链接。' },
+    visible: { label: '官网显示' },
+    sortOrder: { label: '显示顺序', description: '数字越小越靠前。' },
+  },
 };
 
 const componentLocalizations: Record<string, ModelLocalization> = {
@@ -127,6 +144,15 @@ const componentLocalizations: Record<string, ModelLocalization> = {
   },
   'shared.text-item': {
     value: { label: '内容', placeholder: '请输入一条内容' },
+  },
+  'shared.section-item': {
+    eyebrow: { label: '上方小标题' },
+    title: { label: '标题' },
+    text: { label: '说明文字' },
+    representativeProduct: { label: '代表产品', description: '选择一个已有菜单产品，首页会自动使用它的产品图片。' },
+    image: { label: '备用图片', description: '没有选择代表产品或代表产品没有图片时，首页才会使用这张图片。' },
+    buttonText: { label: '按钮文字' },
+    buttonLink: { label: '按钮链接' },
   },
 };
 

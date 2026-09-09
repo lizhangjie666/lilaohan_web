@@ -1,8 +1,9 @@
 {$SITE_ADDRESS:http://localhost} {
   encode zstd gzip
 
+  # 仅通过服务器本机端口和 SSH 隧道访问后台，避免 IP 验收阶段使用明文公网登录。
   handle /admin* {
-    reverse_proxy backend:1337
+    respond "Not Found" 404
   }
 
   handle /api/* {

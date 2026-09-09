@@ -1,16 +1,19 @@
 <script setup lang="ts">
-const { tutorials, settings } = useContent()
-const [{ data: list }, { data: site }] = await Promise.all([
+import { mergePageSections } from '~/data/page-sections'
+const { tutorials, settings, pageSections } = useContent()
+const [{ data: list }, { data: site }, { data: sectionList }] = await Promise.all([
   useAsyncData('tutorials', tutorials),
   useAsyncData('diy-settings', settings),
+  useAsyncData('diy-sections', () => pageSections('diy')),
 ])
+const blocks = computed(() => mergePageSections(sectionList.value, ['diy.hero', 'diy.empty']))
 useSeoMeta({ title: '手作体验', description: '查看面包DIY与披萨DIY流程，亲手完成一份窑烤作品。' })
 </script>
 
 <template>
   <div>
-    <PageHero eyebrow="MAKE IT YOURSELF" title="这一次，换你来做。" description="从面团到出炉，每一步都能亲手参与。教程用于出发前了解流程，实际体验安排请提前联系门店确认。" :image="site?.diyHeroImage" :image-alt="site?.diyHeroImageAlt">
-      <NuxtLink to="/visit#contact" class="btn-primary">咨询手作体验</NuxtLink>
+    <PageHero :eyebrow="blocks.hero.eyebrow" :title="blocks.hero.title" :description="blocks.hero.description" :image="blocks.hero.image || site?.diyHeroImage" :image-alt="blocks.hero.image ? blocks.hero.imageAlt : site?.diyHeroImageAlt">
+      <NuxtLink v-if="blocks.hero.primaryButtonText" :to="blocks.hero.primaryButtonLink || '/visit#contact'" class="btn-primary">{{ blocks.hero.primaryButtonText }}</NuxtLink>
     </PageHero>
     <section class="page-wrap py-16 md:py-24">
       <div v-if="list?.length" class="grid gap-8 md:grid-cols-2">
@@ -19,7 +22,7 @@ useSeoMeta({ title: '手作体验', description: '查看面包DIY与披萨DIY流
           <div class="p-7 md:p-9"><p class="eyebrow">{{ item.type }}</p><h2 class="mt-3 font-serif text-3xl font-semibold">{{ item.title }}</h2><p class="mt-4 leading-8 text-charcoal">{{ item.summary }}</p><div class="mt-6 flex gap-4 text-sm font-semibold"><span>{{ item.duration }}</span><span>{{ item.people }}</span></div><span class="mt-7 inline-block border-b border-ink pb-1 font-semibold">查看步骤 →</span></div>
         </NuxtLink>
       </div>
-      <div v-else class="rounded-[2rem] border border-ink/15 bg-white px-6 py-16 text-center"><h2 class="font-serif text-3xl font-semibold">手作体验正在整理</h2><p class="mt-4 text-charcoal">具体体验项目和时间请先联系门店确认。</p></div>
+      <div v-else class="rounded-[2rem] border border-ink/15 bg-white px-6 py-16 text-center"><h2 class="font-serif text-3xl font-semibold">{{ blocks.empty.title }}</h2><p class="mt-4 text-charcoal">{{ blocks.empty.description }}</p></div>
     </section>
     <ContactPanel />
   </div>

@@ -7,6 +7,7 @@ import {
   registerChineseAdminDefaults,
   setExistingAdminsToChinese,
 } from './admin-localization';
+import { ensureDefaultPageSections } from './page-section-defaults';
 
 export default {
   /**
@@ -27,6 +28,7 @@ export default {
    * run jobs, or perform some special logic.
    */
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    await ensureDefaultPageSections(strapi);
     await localizeAdminContent(strapi);
     await configureChineseEditorRole(strapi);
     await configurePublicReadPermissions(strapi);

@@ -1,9 +1,12 @@
 <script setup lang="ts">
-const { products, settings } = useContent()
-const [{ data: list }, { data: site }] = await Promise.all([
+import { mergePageSections } from '~/data/page-sections'
+const { products, settings, pageSections } = useContent()
+const [{ data: list }, { data: site }, { data: sectionList }] = await Promise.all([
   useAsyncData('products', products),
   useAsyncData('menu-settings', settings),
+  useAsyncData('menu-sections', () => pageSections('menu')),
 ])
+const blocks = computed(() => mergePageSections(sectionList.value, ['menu.hero', 'menu.empty']))
 const categories = computed(() => ['全部', ...new Set((list.value || []).map(item => item.category).filter(Boolean))])
 const active = ref('全部')
 const visible = computed(() => active.value === '全部' ? list.value : list.value?.filter(item => item.category === active.value))
@@ -12,7 +15,7 @@ useSeoMeta({ title: '窑烤菜单', description: '查看李老汉窑烤面包的
 
 <template>
   <div>
-    <PageHero eyebrow="WOOD-FIRED MENU" title="窑里今天，正在发生什么。" description="菜单随出炉节奏、季节和当天备料更新。页面价格为参考，具体供应请以门店当天为准。" :image="site?.menuHeroImage" :image-alt="site?.menuHeroImageAlt" />
+    <PageHero :eyebrow="blocks.hero.eyebrow" :title="blocks.hero.title" :description="blocks.hero.description" :image="blocks.hero.image || site?.menuHeroImage" :image-alt="blocks.hero.image ? blocks.hero.imageAlt : site?.menuHeroImageAlt" />
     <section class="page-wrap py-14 md:py-20">
       <template v-if="list?.length">
         <div class="flex gap-2 overflow-x-auto pb-4" role="tablist" aria-label="产品分类">
@@ -23,9 +26,9 @@ useSeoMeta({ title: '窑烤菜单', description: '查看李老汉窑烤面包的
         </div>
       </template>
       <div v-else class="rounded-[2rem] border border-ink/15 bg-white px-6 py-16 text-center">
-        <h2 class="font-serif text-3xl font-semibold">当前菜单待更新</h2>
-        <p class="mt-4 text-charcoal">门店正在整理当天供应内容，出发前可通过电话或微信咨询。</p>
-        <NuxtLink to="/visit#contact" class="btn-primary mt-7">联系门店</NuxtLink>
+        <h2 class="font-serif text-3xl font-semibold">{{ blocks.empty.title }}</h2>
+        <p class="mt-4 text-charcoal">{{ blocks.empty.description }}</p>
+        <NuxtLink v-if="blocks.empty.primaryButtonText" :to="blocks.empty.primaryButtonLink || '/visit#contact'" class="btn-primary mt-7">{{ blocks.empty.primaryButtonText }}</NuxtLink>
       </div>
     </section>
     <ContactPanel />

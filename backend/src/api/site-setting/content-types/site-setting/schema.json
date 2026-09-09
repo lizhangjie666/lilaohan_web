@@ -9,6 +9,7 @@
   "options": { "draftAndPublish": true },
   "attributes": {
     "storeName": { "type": "string", "required": true, "default": "李老汉窑烤面包" },
+    "brandLogo": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
     "heroTitle": { "type": "string", "default": "在镇山村，等一炉面包慢慢出炉。" },
     "heroIntro": { "type": "text" },
     "heroImage": { "type": "media", "multiple": false, "allowedTypes": ["images"] },

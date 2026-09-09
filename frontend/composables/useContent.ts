@@ -1,11 +1,13 @@
 import { fallbackProducts, fallbackSettings, fallbackSpots, fallbackTutorials } from '~/data/fallback'
-import type { PhotoSpot, Product, SiteSettings, Story, StoryStage, Tutorial, TutorialStep } from '~/types/content'
+import type { FAQ, PageSection, PageSectionItem, PhotoSpot, Product, SiteSettings, Story, StoryStage, Tutorial, TutorialStep } from '~/types/content'
 
 type RawRecord = Record<string, any>
 type Entity = RawRecord & { id?: number; attributes?: RawRecord }
 
 const emptySettings: SiteSettings = {
   storeName: '李老汉窑烤面包',
+  brandLogo: '/images/brand-avatar.jpg',
+  brandLogoAlt: '李老汉窑烤面包品牌头像',
   heroTitle: '在镇山村，等一炉面包慢慢出炉。',
   heroIntro: '柴火、面团与村子的慢时间。来吃一口刚出炉，也亲手做一份带走。',
   heroImage: '/images/home-hero.jpg',
@@ -136,6 +138,11 @@ function normalizeSpot(entity: Entity, mediaBase = ''): PhotoSpot {
   }
 }
 
+function normalizeFaq(entity: Entity): FAQ {
+  const item = flatten(entity)
+  return { id: Number(item.id || 0), question: String(item.question || ''), answer: String(item.answer || ''), category: String(item.category || '') }
+}
+
 function normalizeSettings(entity: Entity, mediaBase = ''): SiteSettings {
   const item = flatten(entity)
   const image = (key: string, fallback: string) => mediaUrl(item[key], mediaBase) || fallback
@@ -144,6 +151,8 @@ function normalizeSettings(entity: Entity, mediaBase = ''): SiteSettings {
   return {
     ...emptySettings,
     storeName: String(item.storeName || emptySettings.storeName),
+    brandLogo: image('brandLogo', emptySettings.brandLogo),
+    brandLogoAlt: alt('brandLogo', emptySettings.brandLogoAlt),
     heroTitle: String(item.heroTitle || emptySettings.heroTitle),
     heroIntro: String(item.heroIntro || emptySettings.heroIntro),
     heroImage: image('heroImage', emptySettings.heroImage),
@@ -201,6 +210,44 @@ function normalizeStory(entity: Entity, mediaBase = ''): Story {
   }
 }
 
+function normalizeSectionItem(value: RawRecord, mediaBase = ''): PageSectionItem {
+  const representativeProduct = flatten(value.representativeProduct?.data ?? value.representativeProduct)
+  const representativeImage = mediaUrl(representativeProduct.image, mediaBase)
+  const fallbackImage = mediaUrl(value.image, mediaBase)
+  return {
+    eyebrow: String(value.eyebrow || ''),
+    title: String(value.title || ''),
+    text: String(value.text || ''),
+    image: representativeImage || fallbackImage || undefined,
+    imageAlt: representativeImage
+      ? mediaAlt(representativeProduct.image) || String(value.title || representativeProduct.name || '品类代表产品图片')
+      : mediaAlt(value.image) || String(value.title || '页面板块图片'),
+    buttonText: String(value.buttonText || ''),
+    buttonLink: String(value.buttonLink || ''),
+  }
+}
+
+function normalizePageSection(entity: Entity, mediaBase = ''): PageSection {
+  const item = flatten(entity)
+  return {
+    sectionName: String(item.sectionName || ''),
+    pageKey: String(item.pageKey || ''),
+    sectionKey: String(item.sectionKey || ''),
+    eyebrow: String(item.eyebrow || ''),
+    title: String(item.title || ''),
+    description: String(item.description || ''),
+    image: mediaUrl(item.image, mediaBase),
+    imageAlt: mediaAlt(item.image) || String(item.title || item.sectionName || '页面板块图片'),
+    primaryButtonText: String(item.primaryButtonText || ''),
+    primaryButtonLink: String(item.primaryButtonLink || ''),
+    secondaryButtonText: String(item.secondaryButtonText || ''),
+    secondaryButtonLink: String(item.secondaryButtonLink || ''),
+    items: Array.isArray(item.items) ? item.items.map((entry: RawRecord) => normalizeSectionItem(entry, mediaBase)) : [],
+    visible: item.visible !== false,
+    sortOrder: Number(item.sortOrder || 0),
+  }
+}
+
 export function useContent() {
   const config = useRuntimeConfig()
   const apiBase = String(import.meta.server ? config.strapiUrl : config.public.strapiUrl).replace(/\/$/, '')
@@ -253,7 +300,17 @@ export function useContent() {
       'populate[image]=true&populate[materials]=true&populate[notes]=true&populate[steps][populate][image]=true',
     ),
     spots: () => getCollection('photo-spots', entity => normalizeSpot(entity, mediaBase), fallbackSpots),
+    faqs: () => getCollection('faqs', normalizeFaq, []),
     settings: () => getSingle('site-setting', entity => normalizeSettings(entity, mediaBase), emptySettings),
     story: () => getSingle('story', entity => normalizeStory(entity, mediaBase), emptyStory),
+    pageSections: async (pageKey: string) => {
+      try {
+        const query = `filters[pageKey][$eq]=${encodeURIComponent(pageKey)}&filters[visible][$eq]=true&sort=sortOrder:asc&populate[image]=true&populate[items][populate][image]=true&populate[items][populate][representativeProduct][populate][image]=true`
+        const result = await request(`page-sections?${query}`) as { data?: Entity[] }
+        return Array.isArray(result.data) ? result.data.map(entity => normalizePageSection(entity, mediaBase)) : []
+      } catch {
+        return []
+      }
+    },
   }
 }
