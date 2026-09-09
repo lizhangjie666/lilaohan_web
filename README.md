@@ -32,7 +32,7 @@
 - 复制 `deploy/.env.example` 为 `deploy/.env`，填写域名、数据库密码和随机密钥。
 - 运行 `docker compose --env-file deploy/.env up -d --build`，启动 Nuxt、Strapi、PostgreSQL 和 Caddy。
 - Caddy 将 `/api` 和 `/uploads` 转发到 Strapi，其余页面转发到 Nuxt；后台发布后官网会在下一次访问时读取新内容。
-- 仅使用 IP 验收时，公网 `/admin` 会返回 404。运行 `ssh -L 2337:127.0.0.1:1337 root@服务器IP` 建立安全隧道，再访问 `http://localhost:2337/admin`。绑定正式域名并启用 HTTPS 后，可再按需开放公网后台。
+- 仅使用 IP 验收时，公网 `/admin` 会返回 404。运行 `ssh -L 2337:127.0.0.1:1337 ubuntu@服务器IP` 建立安全隧道，再访问 `http://localhost:2337/admin`。绑定正式域名并启用 HTTPS 后，可再按需开放公网后台。
 - 上传文件默认保存在 Docker 数据卷中；正式长期运行建议接入阿里云 OSS 或腾讯云 COS，并做好数据库与上传目录备份。
 - 中国大陆公开网站上线前完成域名实名认证、ICP备案及必要的公安备案。
 

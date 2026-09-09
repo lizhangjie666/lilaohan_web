@@ -35,7 +35,8 @@ services:
       database:
         condition: service_healthy
     volumes:
-      - uploads_data:/app/public/uploads
+      # 挂载整个 public 目录，确保 Strapi 官方导入可以安全备份并恢复 uploads。
+      - uploads_data:/app/public
 
   frontend:
     build: ./frontend
@@ -44,7 +45,8 @@ services:
       NODE_ENV: production
       HOST: 0.0.0.0
       PORT: 3000
-      STRAPI_URL: http://backend:1337
+      # Nuxt 运行时私有配置必须使用 NUXT_ 前缀，SSR 才会访问容器内的 Strapi。
+      NUXT_STRAPI_URL: http://backend:1337
       NUXT_PUBLIC_STRAPI_URL: ${PUBLIC_SITE_URL}
     depends_on:
       - backend
@@ -55,8 +57,6 @@ services:
     env_file: ./deploy/.env
     ports:
       - "80:80"
-      - "443:443"
-      - "443:443/udp"
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

@@ -130,3 +130,14 @@ Sites 项目标识保存在 `frontend/.openai/hosting.json`，必须复用现有
 - 生产环境采用 Nuxt、Strapi、PostgreSQL 与 Caddy 的 Docker 分离部署；上传目录和数据库必须持续备份
 - IP 验收阶段不开放公网 `/admin`；Strapi 的 `1337` 只绑定服务器环回地址，通过本机 `2337 → 服务器 1337` 的 SSH 隧道访问中文后台
 - 后台启动时会自动补回内容模型新增但旧布局遗漏的字段，并把必填字段放在表单顶部，避免出现字段被隐藏却无法发布的问题
+
+## 11. 腾讯云部署状态
+
+- 2026-09-10 已部署到腾讯云 Ubuntu 24.04，IP 验收地址为 `http://122.51.118.103`
+- 云端使用 Docker Compose 运行 Nuxt、Strapi 5、PostgreSQL 17 与 Caddy，容器均启用自动重启
+- 本地 SQLite 中的内容、关系和媒体已迁移到云端 PostgreSQL；迁移完成后服务器临时传输包已删除，本地原始数据库继续作为回退副本
+- 公网只开放 SSH `22` 和 HTTP `80`；`1337`、`3000`、`5432` 不对公网开放，公网 `/admin` 返回 404
+- 云端后台不迁移本地管理员账号。首次使用时运行 `ssh -L 2337:127.0.0.1:1337 ubuntu@122.51.118.103`，再打开 `http://localhost:2337/admin` 创建管理员
+- Nuxt 容器的服务端接口地址使用 `NUXT_STRAPI_URL=http://backend:1337`；浏览器公开接口地址使用 `NUXT_PUBLIC_STRAPI_URL`
+- 服务器密钥只保存在服务器 `/opt/lilaohan_web/deploy/.env`，该文件不得提交到 Git
+- 当前为 IP + HTTP 验收环境；正式推广前需绑定已备案域名，并由 Caddy 启用 HTTPS

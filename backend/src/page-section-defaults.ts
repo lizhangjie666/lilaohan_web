@@ -73,7 +73,8 @@ export async function ensureDefaultPageSections(strapi: Core.Strapi) {
     if (homeMenu && (!Array.isArray(homeMenu.items) || homeMenu.items.length === 0)) {
       await documents.update({
         documentId: homeMenu.documentId,
-        data: { items: homeMenuItems },
+        // Docker 构建时不会携带 Strapi 本地生成的类型文件，运行时模型仍会校验组件结构。
+        data: { items: homeMenuItems } as any,
         status: 'published',
       });
     }
