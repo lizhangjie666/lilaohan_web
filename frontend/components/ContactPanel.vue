@@ -16,7 +16,7 @@ const visitText = computed(() => content.value.description || [
 
 <template>
   <section class="relative isolate overflow-hidden bg-fire py-14 text-white md:py-20">
-    <img v-if="content.image" :src="content.image" :alt="content.imageAlt" class="absolute inset-0 -z-20 h-full w-full object-cover opacity-30">
+    <ContentImage v-if="content.image" :image="content.image" :alt="content.imageAlt" class="absolute inset-0 -z-20 h-full w-full object-cover opacity-30" />
     <div v-if="content.image" class="absolute inset-0 -z-10 bg-fire/80" />
     <div class="page-wrap grid items-end gap-10 md:grid-cols-[1.5fr_1fr]">
       <div><p class="text-xs font-semibold tracking-[0.2em] text-white/65">{{ content.eyebrow }}</p><h2 class="mt-4 whitespace-pre-line font-serif text-4xl font-semibold md:text-6xl">{{ content.title }}</h2><p class="mt-5 max-w-2xl whitespace-pre-line leading-8 text-white/75">{{ visitText }}</p></div>

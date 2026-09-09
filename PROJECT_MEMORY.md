@@ -141,3 +141,7 @@ Sites 项目标识保存在 `frontend/.openai/hosting.json`，必须复用现有
 - Nuxt 容器的服务端接口地址使用 `NUXT_STRAPI_URL=http://backend:1337`；浏览器公开接口地址使用 `NUXT_PUBLIC_STRAPI_URL`
 - 服务器密钥只保存在服务器 `/opt/lilaohan_web/deploy/.env`，该文件不得提交到 Git
 - 当前为 IP + HTTP 验收环境；正式推广前需绑定已备案域名，并由 Caddy 启用 HTTPS
+- 前端内容图片统一使用 Strapi 的 `small`、`medium`、`large` 多尺寸资源和响应式 `srcset`；有多尺寸资源时不直接加载上传原图
+- 首屏图片使用高优先级加载，其余内容图片默认延迟加载并异步解码；图片宽高来自媒体对象，用于减少页面跳动
+- Caddy 对 `/uploads/*` 和 `/images/*` 返回一年期不可变缓存；后台替换媒体会生成新哈希地址，不受旧图片缓存影响
+- 本地备用首屏图已压缩到约 436KB，品牌头像约 13KB；首页八张云端内容图的大尺寸版本合计约 1.16MB

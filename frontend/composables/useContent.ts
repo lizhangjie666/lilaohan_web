@@ -1,5 +1,5 @@
 import { fallbackProducts, fallbackSettings, fallbackSpots, fallbackTutorials } from '~/data/fallback'
-import type { FAQ, PageSection, PageSectionItem, PhotoSpot, Product, SiteSettings, Story, StoryStage, Tutorial, TutorialStep } from '~/types/content'
+import type { FAQ, ImageAsset, ImageSource, PageSection, PageSectionItem, PhotoSpot, Product, SiteSettings, Story, StoryStage, Tutorial, TutorialStep } from '~/types/content'
 
 type RawRecord = Record<string, any>
 type Entity = RawRecord & { id?: number; attributes?: RawRecord }
@@ -56,11 +56,38 @@ function unwrapMedia(value: any): RawRecord {
   return flatten(value)
 }
 
-function mediaUrl(value: any, base = ''): string {
+function absoluteMediaUrl(url: unknown, base = ''): string {
+  if (typeof url !== 'string' || !url) return ''
+  if (/^https?:\/\//.test(url)) return url
+  return base ? `${base}${url.startsWith('/') ? '' : '/'}${url}` : url
+}
+
+function mediaAsset(value: any, base = '', fallbackAlt = ''): ImageAsset | undefined {
   const media = unwrapMedia(value)
-  if (typeof media.url !== 'string') return ''
-  if (/^https?:\/\//.test(media.url)) return media.url
-  return base ? `${base}${media.url.startsWith('/') ? '' : '/'}${media.url}` : media.url
+  const originalUrl = absoluteMediaUrl(media.url, base)
+  if (!originalUrl) return undefined
+
+  const formats = media.formats && typeof media.formats === 'object' ? media.formats : {}
+  const variants = ['small', 'medium', 'large']
+    .map(key => formats[key])
+    .filter(format => format && typeof format.url === 'string' && Number(format.width) > 0)
+    .sort((a, b) => Number(a.width) - Number(b.width))
+  const preferred = formats.large || formats.medium || formats.small || media
+  const preferredUrl = absoluteMediaUrl(preferred.url, base) || originalUrl
+
+  return {
+    src: preferredUrl,
+    srcset: variants.length
+      ? variants.map(format => `${absoluteMediaUrl(format.url, base)} ${Number(format.width)}w`).join(', ')
+      : undefined,
+    width: Number(preferred.width) || Number(media.width) || undefined,
+    height: Number(preferred.height) || Number(media.height) || undefined,
+    alt: String(media.alternativeText || media.caption || fallbackAlt),
+  }
+}
+
+function mediaSource(value: any, base = '', fallbackAlt = ''): ImageSource | '' {
+  return mediaAsset(value, base, fallbackAlt) || ''
 }
 
 function mediaAlt(value: any): string {
@@ -88,7 +115,7 @@ function normalizeProduct(entity: Entity, mediaBase = ''): Product {
     tags: textItems(item.tags),
     available: item.available !== false,
     featured: item.featured === true,
-    image: mediaUrl(item.image, mediaBase),
+    image: mediaSource(item.image, mediaBase, String(item.name || '菜单产品图片')),
     imageAlt: mediaAlt(item.image) || String(item.name || '菜单产品图片'),
   }
 }
@@ -97,7 +124,7 @@ function normalizeStep(value: RawRecord, mediaBase = ''): TutorialStep {
   return {
     title: String(value.title || ''),
     description: String(value.description || ''),
-    image: mediaUrl(value.image, mediaBase) || undefined,
+    image: mediaAsset(value.image, mediaBase, String(value.title || '手作步骤图片')),
     imageAlt: mediaAlt(value.image) || String(value.title || '手作步骤图片'),
   }
 }
@@ -115,7 +142,7 @@ function normalizeTutorial(entity: Entity, mediaBase = ''): Tutorial {
     materials: textItems(item.materials),
     steps: Array.isArray(item.steps) ? item.steps.map((step: RawRecord) => normalizeStep(step, mediaBase)) : [],
     notes: textItems(item.notes),
-    image: mediaUrl(item.image, mediaBase),
+    image: mediaSource(item.image, mediaBase, String(item.title || '手作体验图片')),
     imageAlt: mediaAlt(item.image) || String(item.title || '手作体验图片'),
     videoUrl: typeof item.videoUrl === 'string' && item.videoUrl.startsWith('https://') ? item.videoUrl : undefined,
     videoLabel: String(item.videoLabel || '观看演示视频'),
@@ -132,7 +159,7 @@ function normalizeSpot(entity: Entity, mediaBase = ''): PhotoSpot {
     bestTime: String(item.bestTime || ''),
     walk: String(item.walk || ''),
     direction: String(item.direction || ''),
-    image: mediaUrl(item.image, mediaBase),
+    image: mediaSource(item.image, mediaBase, String(item.name || '镇山村打卡图片')),
     imageAlt: mediaAlt(item.image) || String(item.name || '镇山村打卡图片'),
     mapUrl: String(item.mapUrl || ''),
   }
@@ -145,31 +172,31 @@ function normalizeFaq(entity: Entity): FAQ {
 
 function normalizeSettings(entity: Entity, mediaBase = ''): SiteSettings {
   const item = flatten(entity)
-  const image = (key: string, fallback: string) => mediaUrl(item[key], mediaBase) || fallback
+  const image = (key: string, fallback: ImageSource, fallbackAlt: string) => mediaSource(item[key], mediaBase, fallbackAlt) || fallback
   const alt = (imageKey: string, fallback: string) => mediaAlt(item[imageKey]) || fallback
 
   return {
     ...emptySettings,
     storeName: String(item.storeName || emptySettings.storeName),
-    brandLogo: image('brandLogo', emptySettings.brandLogo),
+    brandLogo: image('brandLogo', emptySettings.brandLogo, emptySettings.brandLogoAlt),
     brandLogoAlt: alt('brandLogo', emptySettings.brandLogoAlt),
     heroTitle: String(item.heroTitle || emptySettings.heroTitle),
     heroIntro: String(item.heroIntro || emptySettings.heroIntro),
-    heroImage: image('heroImage', emptySettings.heroImage),
+    heroImage: image('heroImage', emptySettings.heroImage, emptySettings.heroImageAlt),
     heroImageAlt: alt('heroImage', emptySettings.heroImageAlt),
-    homeFireImage: image('homeFireImage', emptySettings.homeFireImage),
+    homeFireImage: image('homeFireImage', emptySettings.homeFireImage, emptySettings.homeFireImageAlt),
     homeFireImageAlt: alt('homeFireImage', emptySettings.homeFireImageAlt),
-    menuHeroImage: image('menuHeroImage', emptySettings.menuHeroImage),
+    menuHeroImage: image('menuHeroImage', emptySettings.menuHeroImage, emptySettings.menuHeroImageAlt),
     menuHeroImageAlt: alt('menuHeroImage', emptySettings.menuHeroImageAlt),
-    diyHeroImage: image('diyHeroImage', emptySettings.diyHeroImage),
+    diyHeroImage: image('diyHeroImage', emptySettings.diyHeroImage, emptySettings.diyHeroImageAlt),
     diyHeroImageAlt: alt('diyHeroImage', emptySettings.diyHeroImageAlt),
-    guideHeroImage: image('guideHeroImage', emptySettings.guideHeroImage),
+    guideHeroImage: image('guideHeroImage', emptySettings.guideHeroImage, emptySettings.guideHeroImageAlt),
     guideHeroImageAlt: alt('guideHeroImage', emptySettings.guideHeroImageAlt),
     address: String(item.address || emptySettings.address),
     hours: String(item.hours || emptySettings.hours),
     phone: String(item.phone || ''),
     wechat: String(item.wechat || ''),
-    wechatQr: mediaUrl(item.wechatQr, mediaBase),
+    wechatQr: mediaSource(item.wechatQr, mediaBase, emptySettings.wechatQrAlt),
     wechatQrAlt: alt('wechatQr', emptySettings.wechatQrAlt),
     amapUrl: String(item.amapUrl || ''),
     baiduMapUrl: String(item.baiduMapUrl || ''),
@@ -197,23 +224,23 @@ function normalizeStory(entity: Entity, mediaBase = ''): Story {
     philosophy: String(item.philosophy || ''),
     process,
     teamIntro: String(item.teamIntro || emptyStory.teamIntro),
-    heroImage: mediaUrl(item.heroImage, mediaBase) || emptyStory.heroImage,
+    heroImage: mediaSource(item.heroImage, mediaBase, emptyStory.heroImageAlt) || emptyStory.heroImage,
     heroImageAlt: mediaAlt(item.heroImage) || emptyStory.heroImageAlt,
-    teamImage: mediaUrl(item.teamImage, mediaBase) || emptyStory.teamImage,
+    teamImage: mediaSource(item.teamImage, mediaBase, emptyStory.teamImageAlt) || emptyStory.teamImage,
     teamImageAlt: mediaAlt(item.teamImage) || emptyStory.teamImageAlt,
     gallery: galleryItems
       .map((media: any, index: number) => ({
-        url: mediaUrl(media, mediaBase),
+        image: mediaSource(media, mediaBase, `李老汉窑烤面包故事图片 ${index + 1}`),
         alt: mediaAlt(media) || `李老汉窑烤面包故事图片 ${index + 1}`,
       }))
-      .filter((media: { url: string }) => media.url),
+      .filter((media: { image: ImageSource | '' }) => media.image),
   }
 }
 
 function normalizeSectionItem(value: RawRecord, mediaBase = ''): PageSectionItem {
   const representativeProduct = flatten(value.representativeProduct?.data ?? value.representativeProduct)
-  const representativeImage = mediaUrl(representativeProduct.image, mediaBase)
-  const fallbackImage = mediaUrl(value.image, mediaBase)
+  const representativeImage = mediaAsset(representativeProduct.image, mediaBase, String(value.title || representativeProduct.name || '品类代表产品图片'))
+  const fallbackImage = mediaAsset(value.image, mediaBase, String(value.title || '页面板块图片'))
   return {
     eyebrow: String(value.eyebrow || ''),
     title: String(value.title || ''),
@@ -236,7 +263,7 @@ function normalizePageSection(entity: Entity, mediaBase = ''): PageSection {
     eyebrow: String(item.eyebrow || ''),
     title: String(item.title || ''),
     description: String(item.description || ''),
-    image: mediaUrl(item.image, mediaBase),
+    image: mediaSource(item.image, mediaBase, String(item.title || item.sectionName || '页面板块图片')),
     imageAlt: mediaAlt(item.image) || String(item.title || item.sectionName || '页面板块图片'),
     primaryButtonText: String(item.primaryButtonText || ''),
     primaryButtonLink: String(item.primaryButtonLink || ''),

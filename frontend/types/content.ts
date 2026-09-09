@@ -1,3 +1,13 @@
+export interface ImageAsset {
+  src: string
+  srcset?: string
+  width?: number
+  height?: number
+  alt?: string
+}
+
+export type ImageSource = string | ImageAsset
+
 export interface Product {
   id: number
   slug: string
@@ -8,14 +18,14 @@ export interface Product {
   tags: string[]
   available: boolean
   featured?: boolean
-  image: string
+  image: ImageSource
   imageAlt: string
 }
 
 export interface TutorialStep {
   title: string
   description: string
-  image?: string
+  image?: ImageSource
   imageAlt?: string
 }
 
@@ -30,7 +40,7 @@ export interface Tutorial {
   materials: string[]
   steps: TutorialStep[]
   notes: string[]
-  image: string
+  image: ImageSource
   imageAlt: string
   videoUrl?: string
   videoLabel?: string
@@ -44,7 +54,7 @@ export interface PhotoSpot {
   bestTime: string
   walk: string
   direction: string
-  image: string
+  image: ImageSource
   imageAlt: string
   mapUrl: string
 }
@@ -58,25 +68,25 @@ export interface FAQ {
 
 export interface SiteSettings {
   storeName: string
-  brandLogo: string
+  brandLogo: ImageSource
   brandLogoAlt: string
   heroTitle: string
   heroIntro: string
-  heroImage: string
+  heroImage: ImageSource
   heroImageAlt: string
-  homeFireImage: string
+  homeFireImage: ImageSource
   homeFireImageAlt: string
-  menuHeroImage: string
+  menuHeroImage: ImageSource
   menuHeroImageAlt: string
-  diyHeroImage: string
+  diyHeroImage: ImageSource
   diyHeroImageAlt: string
-  guideHeroImage: string
+  guideHeroImage: ImageSource
   guideHeroImageAlt: string
   address: string
   hours: string
   phone: string
   wechat: string
-  wechatQr: string
+  wechatQr: ImageSource
   wechatQrAlt: string
   amapUrl: string
   baiduMapUrl: string
@@ -96,18 +106,18 @@ export interface Story {
   philosophy: string
   process: StoryStage[]
   teamIntro: string
-  heroImage: string
+  heroImage: ImageSource
   heroImageAlt: string
-  teamImage: string
+  teamImage: ImageSource
   teamImageAlt: string
-  gallery: Array<{ url: string; alt: string }>
+  gallery: Array<{ image: ImageSource; alt: string }>
 }
 
 export interface PageSectionItem {
   eyebrow?: string
   title: string
   text?: string
-  image?: string
+  image?: ImageSource
   imageAlt?: string
   buttonText?: string
   buttonLink?: string
@@ -120,7 +130,7 @@ export interface PageSection {
   eyebrow: string
   title: string
   description: string
-  image: string
+  image: ImageSource
   imageAlt: string
   primaryButtonText: string
   primaryButtonLink: string
