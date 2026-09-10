@@ -10,11 +10,57 @@
   --lake: #315e68;
 }
 
-html { scroll-behavior: smooth; }
-body { margin: 0; background: var(--flour); color: var(--ink); font-family: "Source Han Sans SC", "Noto Sans CJK SC", system-ui, sans-serif; }
+html { overflow-x: clip; scroll-behavior: smooth; }
+body { margin: 0; overflow-x: clip; background: var(--flour); color: var(--ink); font-family: "Source Han Sans SC", "Noto Sans CJK SC", system-ui, sans-serif; }
 body::selection { background: var(--fire); color: white; }
 a, button { -webkit-tap-highlight-color: transparent; }
 img { background: #d9c8b3; }
+
+.motion-progress {
+  transform: scaleX(0);
+  transform-origin: left center;
+  will-change: transform;
+}
+
+.motion-reveal { opacity: 1; transform: none; }
+.motion-enabled .motion-reveal {
+  opacity: 0;
+  transform: translate3d(0, 2rem, 0);
+  transition: opacity 800ms cubic-bezier(.22, 1, .36, 1), transform 900ms cubic-bezier(.22, 1, .36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+.motion-enabled .motion-reveal.reveal-from-left { transform: translate3d(-2.5rem, 0, 0); }
+.motion-enabled .motion-reveal.reveal-from-right { transform: translate3d(2.5rem, 0, 0); }
+.motion-enabled .motion-reveal.is-visible { opacity: 1; transform: translate3d(0, 0, 0); }
+
+.hero-media { transform: translate3d(0, var(--hero-parallax, 0px), 0); will-change: transform; }
+.hero-media img { transform: scale(1); }
+.motion-enabled .hero-media img { opacity: 0; transform: scale(1.075); transition: opacity 900ms ease, transform 2200ms cubic-bezier(.22, 1, .36, 1); }
+.motion-enabled .hero-is-ready .hero-media img { opacity: 1; transform: scale(1.025); }
+.motion-enabled .hero-copy-item { opacity: 0; transform: translate3d(0, 1.5rem, 0); }
+.motion-enabled .hero-is-ready .hero-copy-item {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition: opacity 800ms cubic-bezier(.22, 1, .36, 1), transform 900ms cubic-bezier(.22, 1, .36, 1);
+  transition-delay: var(--hero-delay, 0ms);
+}
+.hero-ember-glow {
+  background: radial-gradient(circle at 76% 62%, rgba(235, 101, 53, .28), transparent 28%);
+  mix-blend-mode: screen;
+  animation: ember-breathe 5.5s ease-in-out infinite alternate;
+}
+.fire-parallax { transform: translate3d(0, var(--fire-parallax, 0px), 0) scale(1.08); will-change: transform; }
+.fire-badge { animation: badge-float 4s ease-in-out infinite; }
+.menu-motion-grid { perspective: 1200px; }
+
+@media (hover: hover) and (pointer: fine) {
+  .menu-motion-card { transform-style: preserve-3d; transition: transform 450ms cubic-bezier(.22, 1, .36, 1), border-color 300ms ease, box-shadow 450ms ease; }
+  .menu-motion-card:hover { transform: translate3d(0, -.55rem, 0) rotateX(1.25deg); box-shadow: 0 24px 54px rgba(0, 0, 0, .22); }
+}
+
+@keyframes ember-breathe { from { opacity: .5; transform: scale(.96); } to { opacity: .9; transform: scale(1.06); } }
+@keyframes badge-float { 0%, 100% { transform: translate3d(0, 0, 0) rotate(6deg); } 50% { transform: translate3d(0, -.55rem, 0) rotate(3deg); } }
 
 @layer components {
   .page-wrap { @apply mx-auto w-full max-w-[1440px] px-5 md:px-10 lg:px-16; }
@@ -30,5 +76,6 @@ img { background: #d9c8b3; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  .hero-media, .fire-parallax { transform: none !important; }
 }
