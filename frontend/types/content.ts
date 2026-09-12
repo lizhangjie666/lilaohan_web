@@ -27,6 +27,25 @@ export interface TutorialStep {
   description: string
   image?: ImageSource
   imageAlt?: string
+  isIllustration?: boolean
+}
+
+export interface DiyResourceItem {
+  name: string
+  image?: ImageSource
+  imageAlt: string
+  isIllustration?: boolean
+}
+
+export interface DiySetting {
+  price: number
+  priceUnit: string
+  doughPerPerson: string
+  breadsPerPerson: string
+  bookingGift: string
+  featuredTutorialSlug: string
+  seoTitle: string
+  seoDescription: string
 }
 
 export interface Tutorial {
@@ -38,10 +57,13 @@ export interface Tutorial {
   duration: string
   people: string
   materials: string[]
+  ingredients: DiyResourceItem[]
+  tools: DiyResourceItem[]
   steps: TutorialStep[]
   notes: string[]
-  image: ImageSource
+  image?: ImageSource
   imageAlt: string
+  consultationTip?: string
   videoUrl?: string
   videoLabel?: string
 }

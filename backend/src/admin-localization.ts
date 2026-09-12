@@ -38,7 +38,9 @@ const contentTypeLocalizations: Record<string, ModelLocalization> = {
     summary: { label: '体验简介' },
     duration: { label: '预计时长', placeholder: '例如：约 90 分钟' },
     people: { label: '适合人数', placeholder: '例如：2–8 人' },
-    materials: { label: '材料与工具', description: '点击添加，可填写多条内容。' },
+    materials: { label: '材料与工具简述', description: '保留用于简要文字说明；详细配料和工具请使用下面的图片项目。' },
+    ingredients: { label: '提供配料', description: '逐项填写配料名称，可为每项上传真实照片。' },
+    tools: { label: '提供工具', description: '逐项填写工具名称，可为每项上传真实照片。' },
     steps: { label: '体验步骤' },
     notes: { label: '注意事项', description: '点击添加，可填写多条内容。' },
     consultationTip: { label: '咨询提示', placeholder: '例如：周末建议提前通过微信咨询。' },
@@ -47,6 +49,15 @@ const contentTypeLocalizations: Record<string, ModelLocalization> = {
     image: { label: '封面图片' },
     visible: { label: '官网显示' },
     sortOrder: { label: '显示顺序', description: '数字越小越靠前。' },
+    seo: { label: '搜索展示设置' },
+  },
+  'api::diy-setting.diy-setting': {
+    price: { label: '活动价格', description: '只填写数字，例如 78；页面所有价格会统一使用这里的数值。' },
+    priceUnit: { label: '价格单位', placeholder: '元 / 人' },
+    doughPerPerson: { label: '面团份量说明', placeholder: '每人一份面团' },
+    breadsPerPerson: { label: '成品数量说明', placeholder: '可创意造型3–6个面包' },
+    bookingGift: { label: '提前预约赠品', description: '留空时页面不显示赠品活动。' },
+    featuredTutorial: { label: '主推手作项目', description: '选择后，手作页会读取该项目的流程、配料、工具和封面。' },
     seo: { label: '搜索展示设置' },
   },
   'api::photo-spot.photo-spot': {
@@ -136,6 +147,10 @@ const componentLocalizations: Record<string, ModelLocalization> = {
     title: { label: '步骤标题' },
     description: { label: '步骤说明' },
     image: { label: '步骤图片' },
+  },
+  'diy.resource-item': {
+    name: { label: '名称', placeholder: '例如：蔓越莓干或擀面杖' },
+    image: { label: '真实照片', description: '没有照片时官网显示统一品牌占位。' },
   },
   'shared.seo': {
     metaTitle: { label: '搜索标题', description: '建议不超过 60 个字。' },

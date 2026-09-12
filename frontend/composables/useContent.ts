@@ -1,5 +1,5 @@
 import { fallbackProducts, fallbackSettings, fallbackSpots, fallbackTutorials } from '~/data/fallback'
-import type { FAQ, ImageAsset, ImageSource, PageSection, PageSectionItem, PhotoSpot, Product, SiteSettings, Story, StoryStage, Tutorial, TutorialStep } from '~/types/content'
+import type { DiyResourceItem, DiySetting, FAQ, ImageAsset, ImageSource, PageSection, PageSectionItem, PhotoSpot, Product, SiteSettings, Story, StoryStage, Tutorial, TutorialStep } from '~/types/content'
 
 type RawRecord = Record<string, any>
 type Entity = RawRecord & { id?: number; attributes?: RawRecord }
@@ -43,6 +43,17 @@ const emptyStory: Story = {
   teamImage: '/images/home-hero.jpg',
   teamImageAlt: '李老汉窑烤面包店内环境',
   gallery: [],
+}
+
+const defaultDiySetting: DiySetting = {
+  price: 78,
+  priceUnit: '元 / 人',
+  doughPerPerson: '每人一份面团',
+  breadsPerPerson: '可创意造型3–6个面包',
+  bookingGift: '提前预约赠送一份价值10元巧克力豆',
+  featuredTutorialSlug: 'bread-diy',
+  seoTitle: '李老汉窑烤面包DIY体验｜贵阳花溪镇山村',
+  seoDescription: '贵阳市花溪区镇山村窑烤面包DIY体验，78元/人，每人一份面团，可创意造型3–6个面包，提供配料与工具，适合亲子家庭和周末出游。',
 }
 
 function flatten(item: Entity | null | undefined): RawRecord {
@@ -129,6 +140,15 @@ function normalizeStep(value: RawRecord, mediaBase = ''): TutorialStep {
   }
 }
 
+function normalizeDiyResource(value: RawRecord, mediaBase = ''): DiyResourceItem {
+  const name = String(value.name || '')
+  return {
+    name,
+    image: mediaAsset(value.image, mediaBase, `${name || '手作材料'}图片`),
+    imageAlt: mediaAlt(value.image) || `${name || '手作材料'}图片`,
+  }
+}
+
 function normalizeTutorial(entity: Entity, mediaBase = ''): Tutorial {
   const item = flatten(entity)
   return {
@@ -140,12 +160,31 @@ function normalizeTutorial(entity: Entity, mediaBase = ''): Tutorial {
     duration: String(item.duration || ''),
     people: String(item.people || ''),
     materials: textItems(item.materials),
+    ingredients: Array.isArray(item.ingredients) ? item.ingredients.map((entry: RawRecord) => normalizeDiyResource(entry, mediaBase)) : [],
+    tools: Array.isArray(item.tools) ? item.tools.map((entry: RawRecord) => normalizeDiyResource(entry, mediaBase)) : [],
     steps: Array.isArray(item.steps) ? item.steps.map((step: RawRecord) => normalizeStep(step, mediaBase)) : [],
     notes: textItems(item.notes),
     image: mediaSource(item.image, mediaBase, String(item.title || '手作体验图片')),
     imageAlt: mediaAlt(item.image) || String(item.title || '手作体验图片'),
+    consultationTip: String(item.consultationTip || ''),
     videoUrl: typeof item.videoUrl === 'string' && item.videoUrl.startsWith('https://') ? item.videoUrl : undefined,
     videoLabel: String(item.videoLabel || '观看演示视频'),
+  }
+}
+
+function normalizeDiySetting(entity: Entity): DiySetting {
+  const item = flatten(entity)
+  const featured = flatten(item.featuredTutorial?.data ?? item.featuredTutorial)
+  const seo = flatten(item.seo)
+  return {
+    price: Number(item.price ?? defaultDiySetting.price),
+    priceUnit: String(item.priceUnit || defaultDiySetting.priceUnit),
+    doughPerPerson: String(item.doughPerPerson || defaultDiySetting.doughPerPerson),
+    breadsPerPerson: String(item.breadsPerPerson || defaultDiySetting.breadsPerPerson),
+    bookingGift: String(item.bookingGift || ''),
+    featuredTutorialSlug: String(featured.slug || defaultDiySetting.featuredTutorialSlug),
+    seoTitle: String(seo.metaTitle || defaultDiySetting.seoTitle),
+    seoDescription: String(seo.metaDescription || defaultDiySetting.seoDescription),
   }
 }
 
@@ -324,8 +363,9 @@ export function useContent() {
       'diy-tutorials',
       entity => normalizeTutorial(entity, mediaBase),
       fallbackTutorials,
-      'populate[image]=true&populate[materials]=true&populate[notes]=true&populate[steps][populate][image]=true',
+      'populate[image]=true&populate[materials]=true&populate[notes]=true&populate[steps][populate][image]=true&populate[ingredients][populate][image]=true&populate[tools][populate][image]=true',
     ),
+    diySettings: () => getSingle('diy-setting', normalizeDiySetting, defaultDiySetting),
     spots: () => getCollection('photo-spots', entity => normalizeSpot(entity, mediaBase), fallbackSpots),
     faqs: () => getCollection('faqs', normalizeFaq, []),
     settings: () => getSingle('site-setting', entity => normalizeSettings(entity, mediaBase), emptySettings),

@@ -1,0 +1,10 @@
+{
+  "collectionName": "components_diy_resource_items",
+  "info": {
+    "displayName": "配料或工具"
+  },
+  "attributes": {
+    "name": { "type": "string", "required": true },
+    "image": { "type": "media", "multiple": false, "allowedTypes": ["images"] }
+  }
+}

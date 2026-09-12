@@ -7,8 +7,8 @@ const [{ data: site }, { data: globalSections }] = await Promise.all([
   useAsyncData('layout-sections', () => pageSections('global')),
 ])
 const footer = computed(() => globalSections.value?.find(item => item.sectionKey === 'global.footer'))
-const photoCredit = computed(() => globalSections.value?.find(item => item.sectionKey === 'global.photo-credit'))
 const open = ref(false)
+const isDiyLanding = computed(() => route.path === '/diy' || route.path === '/diy/')
 watch(() => route.fullPath, () => { open.value = false })
 const nav = [
   { to: '/menu', label: '窑烤菜单' },
@@ -42,14 +42,13 @@ const nav = [
     <main><slot /></main>
 
     <footer class="bg-ink pb-24 pt-14 text-flour md:pb-14">
-      <div class="page-wrap grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
+      <div class="page-wrap grid gap-10 md:grid-cols-[1.6fr_1fr]">
         <div><ContentImage v-if="footer?.image" :image="footer.image" :alt="footer.imageAlt" sizes="80px" class="mb-5 h-20 w-20 rounded-full object-cover" /><p class="whitespace-pre-line font-serif text-3xl">{{ footer?.title || '等一炉面包，逛一座村子。' }}</p><p class="mt-4 max-w-md whitespace-pre-line text-sm leading-7 text-flour/65">{{ footer?.description || site?.address }}</p></div>
         <div><p class="text-xs tracking-[0.2em] text-flour/50">EXPLORE</p><div class="mt-4 grid gap-3 text-sm"><NuxtLink v-for="item in nav" :key="item.to" :to="item.to" class="hover:text-[#ef8a69]">{{ item.label }}</NuxtLink></div></div>
-        <div><p class="text-xs tracking-[0.2em] text-flour/50">{{ photoCredit?.eyebrow || 'PHOTO CREDIT' }}</p><p class="mt-4 whitespace-pre-line text-xs leading-6 text-flour/55">{{ photoCredit?.description || '正式上线前请逐步替换为门店与镇山村实拍。' }}</p></div>
       </div>
     </footer>
 
-    <div class="fixed inset-x-0 bottom-0 z-50 grid grid-cols-3 border-t border-ink/10 bg-flour p-2 shadow-2xl md:hidden">
+    <div v-if="!isDiyLanding" class="fixed inset-x-0 bottom-0 z-50 grid grid-cols-3 border-t border-ink/10 bg-flour p-2 shadow-2xl md:hidden">
       <a :href="config.public.amapUrl || '/visit'" class="rounded-full px-2 py-3 text-center text-sm font-semibold">地图导航</a>
       <a :href="config.public.phone ? `tel:${config.public.phone}` : '/visit'" class="rounded-full px-2 py-3 text-center text-sm font-semibold">电话咨询</a>
       <NuxtLink to="/visit#wechat" class="rounded-full bg-fire px-2 py-3 text-center text-sm font-semibold text-white">添加微信</NuxtLink>

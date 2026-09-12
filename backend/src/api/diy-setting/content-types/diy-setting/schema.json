@@ -1,0 +1,24 @@
+{
+  "kind": "singleType",
+  "collectionName": "diy_settings",
+  "info": {
+    "singularName": "diy-setting",
+    "pluralName": "diy-settings",
+    "displayName": "手作体验设置",
+    "description": "统一管理面包DIY价格、份量和预约活动"
+  },
+  "options": { "draftAndPublish": true },
+  "attributes": {
+    "price": { "type": "integer", "required": true, "min": 0, "default": 78 },
+    "priceUnit": { "type": "string", "required": true, "default": "元 / 人" },
+    "doughPerPerson": { "type": "string", "required": true, "default": "每人一份面团" },
+    "breadsPerPerson": { "type": "string", "required": true, "default": "可创意造型3–6个面包" },
+    "bookingGift": { "type": "text" },
+    "featuredTutorial": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::diy-tutorial.diy-tutorial"
+    },
+    "seo": { "type": "component", "component": "shared.seo", "repeatable": false }
+  }
+}
