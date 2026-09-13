@@ -5,12 +5,11 @@ const { tutorials, spots, settings, pageSections } = useContent()
 const [{ data: tutorialList }, { data: spotList }, { data: site }, { data: sectionList }] = await Promise.all([
   useAsyncData('home-tutorials', tutorials), useAsyncData('home-spots', spots), useAsyncData('home-settings', settings), useAsyncData('home-sections', () => pageSections('home')),
 ])
-const blocks = computed(() => mergePageSections(sectionList.value, ['home.hero', 'home.fire', 'home.menu', 'home.diy', 'home.guide']))
+const blocks = computed(() => mergePageSections(sectionList.value, ['home.hero', 'home.menu', 'home.diy', 'home.guide']))
 const menuCategories = computed(() => blocks.value.menu.items.length ? blocks.value.menu.items : pageSectionDefaults['home.menu'].items)
 const heroReady = ref(false)
 const progressBar = ref<HTMLElement | null>(null)
 const heroMedia = ref<HTMLElement | null>(null)
-const fireMedia = ref<HTMLElement | null>(null)
 let motionFrame = 0
 let removeMotionListeners: (() => void) | undefined
 
@@ -26,14 +25,6 @@ onMounted(() => {
     if (!motionEnabled) return
 
     heroMedia.value?.style.setProperty('--hero-parallax', `${Math.max(-48, -window.scrollY * 0.055)}px`)
-    if (fireMedia.value) {
-      const rect = fireMedia.value.parentElement?.getBoundingClientRect()
-      if (rect) {
-        const distance = rect.top + rect.height / 2 - window.innerHeight / 2
-        const offset = Math.max(-24, Math.min(24, distance * -0.035))
-        fireMedia.value.style.setProperty('--fire-parallax', `${offset}px`)
-      }
-    }
   }
   const scheduleMotion = () => {
     if (!motionFrame) motionFrame = window.requestAnimationFrame(updateMotion)
@@ -69,10 +60,6 @@ useHead({ script: [{ type: 'application/ld+json', innerHTML: JSON.stringify({ '@
       <div class="page-wrap flex min-h-[82vh] items-end py-16 md:py-24">
         <div class="max-w-3xl"><p class="hero-copy-item text-xs font-semibold tracking-[0.24em] text-[#ff9b78]" style="--hero-delay: 80ms">{{ blocks.hero.eyebrow }}</p><h1 class="hero-copy-item mt-6 whitespace-pre-line font-serif text-5xl font-semibold leading-[1.08] md:text-7xl lg:text-[5.6rem]" style="--hero-delay: 180ms">{{ blocks.hero.title || site?.heroTitle }}</h1><p class="hero-copy-item mt-7 max-w-xl whitespace-pre-line text-base leading-8 text-white/75 md:text-lg" style="--hero-delay: 310ms">{{ blocks.hero.description || site?.heroIntro }}</p><div class="hero-copy-item mt-9 flex flex-wrap gap-3" style="--hero-delay: 430ms"><NuxtLink v-if="blocks.hero.primaryButtonText" :to="blocks.hero.primaryButtonLink || '/menu'" class="btn-primary">{{ blocks.hero.primaryButtonText }}</NuxtLink><NuxtLink v-if="blocks.hero.secondaryButtonText" :to="blocks.hero.secondaryButtonLink || '/visit'" class="btn-secondary border-white/30 bg-white/10 text-white backdrop-blur">{{ blocks.hero.secondaryButtonText }}</NuxtLink></div></div>
       </div>
-    </section>
-
-    <section class="page-wrap py-20 md:py-32">
-      <div class="grid items-center gap-12 md:grid-cols-2"><div v-reveal class="reveal-from-left relative"><div class="relative aspect-[4/5] overflow-hidden rounded-[2rem]"><div ref="fireMedia" class="fire-parallax absolute -inset-y-8 inset-x-0"><ContentImage :image="blocks.fire.image || site?.homeFireImage" :alt="blocks.fire.image ? blocks.fire.imageAlt : site?.homeFireImageAlt" sizes="(min-width: 768px) 50vw, 100vw" class="image-cover" /></div></div><span class="fire-badge absolute -bottom-5 -right-2 grid h-28 w-28 place-items-center rounded-full bg-fire px-4 text-center font-serif text-lg text-white md:right-8">一炉火<br>一整天</span></div><div v-reveal="120" class="reveal-from-right"><p class="eyebrow">{{ blocks.fire.eyebrow }}</p><h2 class="section-title mt-5 whitespace-pre-line">{{ blocks.fire.title }}</h2><p class="body-copy mt-7 whitespace-pre-line">{{ blocks.fire.description }}</p><NuxtLink v-if="blocks.fire.primaryButtonText" :to="blocks.fire.primaryButtonLink || '/story'" class="mt-8 inline-block border-b border-ink pb-1 font-semibold">{{ blocks.fire.primaryButtonText }}</NuxtLink></div></div>
     </section>
 
     <section class="bg-ink py-20 text-flour md:py-28">

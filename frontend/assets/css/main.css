@@ -50,8 +50,6 @@ img { background: #d9c8b3; }
   mix-blend-mode: screen;
   animation: ember-breathe 5.5s ease-in-out infinite alternate;
 }
-.fire-parallax { transform: translate3d(0, var(--fire-parallax, 0px), 0) scale(1.08); will-change: transform; }
-.fire-badge { animation: badge-float 4s ease-in-out infinite; }
 .menu-motion-grid { perspective: 1200px; }
 
 @media (hover: hover) and (pointer: fine) {
@@ -77,5 +75,5 @@ img { background: #d9c8b3; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
-  .hero-media, .fire-parallax { transform: none !important; }
+  .hero-media { transform: none !important; }
 }

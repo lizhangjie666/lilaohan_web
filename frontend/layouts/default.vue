@@ -14,7 +14,6 @@ const nav = [
   { to: '/menu', label: '窑烤菜单' },
   { to: '/diy', label: '手作体验' },
   { to: '/guide', label: '镇山指南' },
-  { to: '/story', label: '关于我们' },
   { to: '/visit', label: '到店指南' },
 ]
 </script>

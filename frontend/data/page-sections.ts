@@ -15,7 +15,6 @@ export const pageSectionDefaults: Record<string, PageSection> = {
   'global.contact': section('global.contact', { eyebrow: 'PLAN YOUR VISIT', title: '火已经生起，等你进村。', primaryButtonText: '一键导航', primaryButtonLink: '/visit', secondaryButtonText: '电话咨询', secondaryButtonLink: '/visit#contact' }),
   'global.footer': section('global.footer', { title: '等一炉面包，逛一座村子。', description: '贵州省贵阳市花溪区镇山村 · 店铺门牌、营业时间与联系方式请以后台发布内容为准。' }),
   'home.hero': section('home.hero', { eyebrow: 'GUIYANG · ZHENSHAN VILLAGE', primaryButtonText: '看看今天吃什么', primaryButtonLink: '/menu', secondaryButtonText: '导航到店', secondaryButtonLink: '/visit' }),
-  'home.fire': section('home.fire', { eyebrow: '01 · 看见一炉火', title: '不是追求快，\n是把火候交给时间。', description: '添柴、看火、等待。窑炉里的高温让面包和披萨长出微焦的边，也让每一次出炉都有一点不同。我们把制作过程留在你看得见的地方。', primaryButtonText: '认识我们的窑炉 →', primaryButtonLink: '/story' }),
   'home.menu': section('home.menu', {
     eyebrow: '02 · 刚出炉的味道',
     title: '今天，想从哪一口开始？',
@@ -51,10 +50,6 @@ export const pageSectionDefaults: Record<string, PageSection> = {
   'guide.overview': section('guide.overview', { items: [{ eyebrow: '建议时长', title: '半日慢游' }, { eyebrow: '建议顺序', title: '店里 → 村中 → 湖边 → 回店' }, { eyebrow: '拍摄提醒', title: '文明拍摄', text: '尊重居民生活，不进入私人空间，不阻塞道路。' }] }),
   'guide.empty': section('guide.empty', { title: '打卡机位正在整理', description: '请以店主实地确认后的路线为准。' }),
   'guide.return': section('guide.return', { title: '逛完村子，回来等一炉面包。', primaryButtonText: '看看今天吃什么', primaryButtonLink: '/menu' }),
-  'story.hero': section('story.hero', { eyebrow: 'OUR FIRE, OUR VILLAGE', title: '在村里生一炉火，做当天的面包。' }),
-  'story.origin': section('story.origin', { eyebrow: '为什么在这里' }),
-  'story.process': section('story.process', { eyebrow: '从生火到出炉', title: '一炉面包的日常' }),
-  'story.team': section('story.team', { eyebrow: 'THE PEOPLE BEHIND THE OVEN', title: '做面包的人，\n也在过村里的日常。' }),
   'visit.hero': section('visit.hero', { eyebrow: 'PLAN YOUR VISIT', title: '进村、找火、等出炉。', description: '出发前请查看营业公告和当天供应。完整门牌、营业时间、停车路线与联系方式需要店主确认后在后台发布。', primaryButtonText: '高德地图导航', secondaryButtonText: '拨打电话' }),
   'visit.info': section('visit.info', { eyebrow: '地址与营业', title: '李老汉窑烤面包' }),
   'visit.contact': section('visit.contact', { eyebrow: '联系门店', title: '咨询DIY或当天供应' }),
