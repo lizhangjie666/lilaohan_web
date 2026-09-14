@@ -1,9 +1,17 @@
 {$SITE_ADDRESS:http://localhost} {
   encode zstd gzip
 
-  # 仅通过服务器本机端口和 SSH 隧道访问后台，避免 IP 验收阶段使用明文公网登录。
-  handle /admin* {
-    respond "Not Found" 404
+  # IP 验收阶段按店主要求开放后台。这里同时代理 Strapi 后台依赖的插件接口，
+  # 避免只打开登录页却无法管理内容或上传图片。
+  @strapiAdmin path /admin /admin/* /content-manager /content-manager/* /content-type-builder /content-type-builder/* /upload /upload/* /i18n /i18n/* /users-permissions /users-permissions/* /review-workflows /review-workflows/* /releases /releases/* /email /email/* /cloud /cloud/*
+  handle @strapiAdmin {
+    header {
+      Cache-Control "no-store"
+      X-Content-Type-Options "nosniff"
+      X-Frame-Options "DENY"
+      Referrer-Policy "same-origin"
+    }
+    reverse_proxy backend:1337
   }
 
   handle /api/* {
