@@ -35,6 +35,7 @@ const contentTypeLocalizations: Record<string, ModelLocalization> = {
     title: { label: '体验名称', placeholder: '例如：亲子窑烤面包 DIY' },
     slug: { label: '网址标识', description: '根据体验名称自动生成，用于教程详情页网址。' },
     type: { label: '体验类型', placeholder: '例如：面包DIY、披萨DIY' },
+    experienceStatus: { label: '体验状态', description: '只填写“开放体验”或“内容筹备中”。开放体验会显示教程入口；内容筹备中只展示项目介绍和微信咨询。', placeholder: '开放体验' },
     summary: { label: '体验简介' },
     duration: { label: '预计时长', placeholder: '例如：约 90 分钟' },
     people: { label: '适合人数', placeholder: '例如：2–8 人' },
@@ -52,8 +53,6 @@ const contentTypeLocalizations: Record<string, ModelLocalization> = {
     seo: { label: '搜索展示设置' },
   },
   'api::diy-setting.diy-setting': {
-    price: { label: '活动价格', description: '只填写数字，例如 78；页面所有价格会统一使用这里的数值。' },
-    priceUnit: { label: '价格单位', placeholder: '元 / 人' },
     doughPerPerson: { label: '面团份量说明', placeholder: '每人一份面团' },
     breadsPerPerson: { label: '成品数量说明', placeholder: '可创意造型3–6个面包' },
     bookingGift: { label: '提前预约赠品', description: '留空时页面不显示赠品活动。' },

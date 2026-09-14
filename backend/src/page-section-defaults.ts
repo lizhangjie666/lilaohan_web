@@ -29,11 +29,14 @@ const defaults: DefaultSection[] = [
   { sectionName: '全站页脚品牌介绍', pageKey: 'global', sectionKey: 'global.footer', title: '等一炉面包，逛一座村子。', description: '贵州省贵阳市花溪区镇山村 · 店铺门牌、营业时间与联系方式请以后台发布内容为准。', sortOrder: 20 },
   { sectionName: '首页·首屏', pageKey: 'home', sectionKey: 'home.hero', eyebrow: 'GUIYANG · ZHENSHAN VILLAGE', primaryButtonText: '看看今天吃什么', primaryButtonLink: '/menu', secondaryButtonText: '导航到店', secondaryButtonLink: '/visit', sortOrder: 0 },
   { sectionName: '首页·窑火故事', pageKey: 'home', sectionKey: 'home.fire', eyebrow: '01 · 看见一炉火', title: '不是追求快，\n是把火候交给时间。', description: '添柴、看火、等待。窑炉里的高温让面包和披萨长出微焦的边，也让每一次出炉都有一点不同。我们把制作过程留在你看得见的地方。', primaryButtonText: '认识我们的窑炉 →', primaryButtonLink: '/story', sortOrder: 10 },
-  { sectionName: '首页·招牌菜单', pageKey: 'home', sectionKey: 'home.menu', eyebrow: '02 · 刚出炉的味道', title: '今天，想从哪一口开始？', primaryButtonText: '查看完整窑烤菜单 →', primaryButtonLink: '/menu', items: homeMenuItems, sortOrder: 20 },
-  { sectionName: '首页·手作体验', pageKey: 'home', sectionKey: 'home.diy', eyebrow: '03 · 亲手做一次', title: '把“我来过”\n变成“我做过”。', description: '揉面、铺料、等待出炉。手作体验不是观看节目，而是一起完成一份可以吃掉的旅行记忆。', primaryButtonText: '查看手作教程', primaryButtonLink: '/diy', sortOrder: 30 },
-  { sectionName: '首页·镇山村指南', pageKey: 'home', sectionKey: 'home.guide', eyebrow: '04 · WALK INTO THE VILLAGE', title: '从店里出发，\n走进镇山村。', description: '把等面包出炉的时间，留给湖边、石板路和村子的风。所有机位将在店主实地核实后正式发布。', primaryButtonText: '打开半日打卡指南 →', primaryButtonLink: '/guide', sortOrder: 40 },
+  { sectionName: '首页·招牌菜单', pageKey: 'home', sectionKey: 'home.menu', eyebrow: '01 · 刚出炉的味道', title: '今天，想从哪一口开始？', primaryButtonText: '查看完整窑烤菜单 →', primaryButtonLink: '/menu', items: homeMenuItems, sortOrder: 10 },
+  { sectionName: '首页·手作体验', pageKey: 'home', sectionKey: 'home.diy', eyebrow: '02 · 亲手做一次', title: '把“我来过”\n变成“我做过”。', description: '揉面、铺料、等待出炉。手作体验不是观看节目，而是一起完成一份可以吃掉的旅行记忆。', primaryButtonText: '查看全部体验', primaryButtonLink: '/diy', sortOrder: 20 },
+  { sectionName: '首页·镇山村指南', pageKey: 'home', sectionKey: 'home.guide', eyebrow: '03 · WALK INTO THE VILLAGE', title: '从店里出发，\n走进镇山村。', description: '把等面包出炉的时间，留给湖边、石板路和村子的风。所有机位将在店主实地核实后正式发布。', primaryButtonText: '打开半日打卡指南 →', primaryButtonLink: '/guide', sortOrder: 30 },
   { sectionName: '菜单页·页头', pageKey: 'menu', sectionKey: 'menu.hero', eyebrow: 'WOOD-FIRED MENU', title: '窑里今天，正在发生什么。', description: '菜单随出炉节奏、季节和当天备料更新。页面价格为参考，具体供应请以门店当天为准。', sortOrder: 10 },
   { sectionName: '菜单页·空状态', pageKey: 'menu', sectionKey: 'menu.empty', title: '当前菜单待更新', description: '门店正在整理当天供应内容，出发前可通过电话或微信咨询。', primaryButtonText: '联系门店', primaryButtonLink: '/visit#contact', sortOrder: 20 },
+  { sectionName: '手作项目目录·页头', pageKey: 'diy-catalog', sectionKey: 'diy-catalog.hero', eyebrow: 'MAKE IT YOURSELF', title: '挑一个喜欢的手作体验。', description: '从面包到披萨，每个项目都有独立的体验介绍和步骤教程。', sortOrder: 10 },
+  { sectionName: '手作项目目录·列表', pageKey: 'diy-catalog', sectionKey: 'diy-catalog.list', eyebrow: 'DIY EXPERIENCES', title: '今天，想亲手做什么？', description: '点击卡片了解体验内容，或直接查看详细教程。', sortOrder: 20 },
+  { sectionName: '手作项目目录·空状态', pageKey: 'diy-catalog', sectionKey: 'diy-catalog.empty', title: '手作体验正在整理', description: '新的体验项目准备好后会在这里发布。', sortOrder: 30 },
   { sectionName: '手作页·页头', pageKey: 'diy', sectionKey: 'diy.hero', eyebrow: 'GUIYANG · ZHENSHAN VILLAGE', title: '窑烤面包 DIY 体验', description: '山有风，面包有香，生活很甜。\n在山水田园间，和面包来一场美好的相遇。', primaryButtonText: '立即预约', secondaryButtonText: '看看怎么玩', secondaryButtonLink: '#diy-process', sortOrder: 10 },
   { sectionName: '手作页·体验价值', pageKey: 'diy', sectionKey: 'diy.value', eyebrow: 'WHAT YOU GET', title: '你能体验什么？', description: '自己做的面包，就是最好吃的。', items: [{ title: '一份面团', text: '每位体验者都有一份属于自己的面团。' }, { title: '自由造型', text: '不限制固定造型，把想象变成可以带回家的面包。' }, { title: '配料与工具', text: '基础配料与制作工具由门店准备。' }], sortOrder: 20 },
   { sectionName: '手作页·开始创作', pageKey: 'diy', sectionKey: 'diy.ready', eyebrow: 'READY TO CREATE', title: '把时间留给创造。', description: '我们提前完成和面与第一次发酵，小朋友拿到面团后，就可以直接开始自由创作。', items: [{ title: '提前和面' }, { title: '完成第一次发酵' }], sortOrder: 30 },
@@ -136,5 +139,25 @@ export async function ensureDefaultPageSections(strapi: Core.Strapi) {
       await documents.update({ documentId: homeMenu.documentId, data: { items }, status: 'published' } as any);
     }
     await migrationStore.set({ key: 'page-section-migration-version', value: 4 });
+  }
+
+  // 删除首页窑火章节后，仅修正仍使用旧默认编号的三个后续章节。
+  if (migrationVersion < 6) {
+    const numbering = [
+      { sectionKey: 'home.menu', oldEyebrow: '02 · 刚出炉的味道', eyebrow: '01 · 刚出炉的味道', sortOrder: 10 },
+      { sectionKey: 'home.diy', oldEyebrow: '03 · 亲手做一次', eyebrow: '02 · 亲手做一次', sortOrder: 20 },
+      { sectionKey: 'home.guide', oldEyebrow: '04 · WALK INTO THE VILLAGE', eyebrow: '03 · WALK INTO THE VILLAGE', sortOrder: 30 },
+    ];
+    for (const item of numbering) {
+      const section = await documents.findFirst({ filters: { sectionKey: item.sectionKey } } as any) as any;
+      if (section?.eyebrow === item.oldEyebrow) {
+        await documents.update({
+          documentId: section.documentId,
+          data: { eyebrow: item.eyebrow, sortOrder: item.sortOrder } as any,
+          status: 'published',
+        });
+      }
+    }
+    await migrationStore.set({ key: 'page-section-migration-version', value: 6 });
   }
 }

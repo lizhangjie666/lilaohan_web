@@ -46,14 +46,12 @@ const emptyStory: Story = {
 }
 
 const defaultDiySetting: DiySetting = {
-  price: 78,
-  priceUnit: '元 / 人',
   doughPerPerson: '每人一份面团',
   breadsPerPerson: '可创意造型3–6个面包',
-  bookingGift: '提前预约赠送一份价值10元巧克力豆',
+  bookingGift: '提前预约赠送一份巧克力豆',
   featuredTutorialSlug: 'bread-diy',
   seoTitle: '李老汉窑烤面包DIY体验｜贵阳花溪镇山村',
-  seoDescription: '贵阳市花溪区镇山村窑烤面包DIY体验，78元/人，每人一份面团，可创意造型3–6个面包，提供配料与工具，适合亲子家庭和周末出游。',
+  seoDescription: '贵阳市花溪区镇山村窑烤面包DIY体验，每人一份面团，可创意造型3–6个面包，提供配料与工具，适合亲子家庭和周末出游。',
 }
 
 function flatten(item: Entity | null | undefined): RawRecord {
@@ -156,6 +154,7 @@ function normalizeTutorial(entity: Entity, mediaBase = ''): Tutorial {
     slug: String(item.slug || ''),
     title: String(item.title || ''),
     type: String(item.type || ''),
+    experienceStatus: item.experienceStatus === '内容筹备中' ? '内容筹备中' : '开放体验',
     summary: String(item.summary || ''),
     duration: String(item.duration || ''),
     people: String(item.people || ''),
@@ -177,8 +176,6 @@ function normalizeDiySetting(entity: Entity): DiySetting {
   const featured = flatten(item.featuredTutorial?.data ?? item.featuredTutorial)
   const seo = flatten(item.seo)
   return {
-    price: Number(item.price ?? defaultDiySetting.price),
-    priceUnit: String(item.priceUnit || defaultDiySetting.priceUnit),
     doughPerPerson: String(item.doughPerPerson || defaultDiySetting.doughPerPerson),
     breadsPerPerson: String(item.breadsPerPerson || defaultDiySetting.breadsPerPerson),
     bookingGift: String(item.bookingGift || ''),

@@ -4,6 +4,7 @@ const breadTutorial = {
   title: '窑烤面包 DIY 体验',
   slug: 'bread-diy',
   type: '面包 DIY',
+  experienceStatus: '开放体验',
   summary: '每人一份面团，自由做出3–6个喜欢的造型，等待窑火把创意烤成香喷喷的面包。',
   duration: '约110分钟',
   people: '亲子家庭、儿童、情侣、朋友和周末游客',
@@ -41,6 +42,27 @@ const breadTutorial = {
   sortOrder: 0,
 };
 
+const preparingTutorials = [
+  {
+    title: '饼干 DIY 体验',
+    slug: 'cookie-diy',
+    type: '饼干 DIY',
+    experienceStatus: '内容筹备中',
+    summary: '项目内容正在筹备中，具体开放时间与体验安排请添加门店微信咨询。',
+    visible: true,
+    sortOrder: 2,
+  },
+  {
+    title: '扎染体验',
+    slug: 'tie-dye',
+    type: '扎染',
+    experienceStatus: '内容筹备中',
+    summary: '项目内容正在筹备中，具体开放时间与体验安排请添加门店微信咨询。',
+    visible: true,
+    sortOrder: 3,
+  },
+];
+
 export async function ensureDefaultDiyContent(strapi: Core.Strapi) {
   const tutorialDocuments = strapi.documents('api::diy-tutorial.diy-tutorial');
   let tutorial = await tutorialDocuments.findFirst({ filters: { slug: 'bread-diy' } } as any) as any;
@@ -49,19 +71,17 @@ export async function ensureDefaultDiyContent(strapi: Core.Strapi) {
   }
 
   const settingDocuments = strapi.documents('api::diy-setting.diy-setting');
-  const setting = await settingDocuments.findFirst({ populate: ['featuredTutorial'] } as any) as any;
+  const setting = await settingDocuments.findFirst({ populate: ['featuredTutorial', 'seo', 'seo.shareImage'] } as any) as any;
   if (!setting) {
     await settingDocuments.create({
       data: {
-        price: 78,
-        priceUnit: '元 / 人',
         doughPerPerson: '每人一份面团',
         breadsPerPerson: '可创意造型3–6个面包',
-        bookingGift: '提前预约赠送一份价值10元巧克力豆',
+        bookingGift: '提前预约赠送一份巧克力豆',
         featuredTutorial: tutorial.documentId,
         seo: {
           metaTitle: '李老汉窑烤面包DIY体验｜贵阳花溪镇山村',
-          metaDescription: '贵阳市花溪区镇山村窑烤面包DIY体验，78元/人，每人一份面团，可创意造型3–6个面包，提供配料与工具，适合亲子家庭和周末出游。',
+          metaDescription: '贵阳市花溪区镇山村窑烤面包DIY体验，每人一份面团，可创意造型3–6个面包，提供配料与工具，适合亲子家庭和周末出游。',
         },
       } as any,
       status: 'published',
@@ -98,6 +118,59 @@ export async function ensureDefaultDiyContent(strapi: Core.Strapi) {
         status: 'published',
       });
     }
-    await migrationStore.set({ key: 'diy-promotion-migration-version', value: 1 });
+  }
+
+  if (version < 2 && setting) {
+    const legacyGift = ['提前预约赠送一份价值', '10', '元巧克力豆'].join('');
+    const update: Record<string, any> = {};
+    if (setting.bookingGift === legacyGift) update.bookingGift = '提前预约赠送一份巧克力豆';
+    if (setting.seo?.metaDescription?.includes('每人一份面团') && setting.seo.metaDescription.includes('适合亲子家庭和周末出游')) {
+      update.seo = {
+        ...(setting.seo.id ? { id: setting.seo.id } : {}),
+        metaTitle: setting.seo.metaTitle,
+        metaDescription: '贵阳市花溪区镇山村窑烤面包DIY体验，每人一份面团，可创意造型3–6个面包，提供配料与工具，适合亲子家庭和周末出游。',
+        ...(setting.seo.shareImage ? { shareImage: setting.seo.shareImage.id ?? setting.seo.shareImage } : {}),
+      };
+    }
+    if (Object.keys(update).length) {
+      await settingDocuments.update({ documentId: setting.documentId, data: update as any, status: 'published' });
+    }
+  }
+  if (version < 2) await migrationStore.set({ key: 'diy-promotion-migration-version', value: 2 });
+
+  if (version < 3) {
+    for (const item of preparingTutorials) {
+      const existing = await tutorialDocuments.findFirst({ filters: { slug: item.slug } } as any);
+      if (!existing) await tutorialDocuments.create({ data: item as any, status: 'published' });
+    }
+    await migrationStore.set({ key: 'diy-promotion-migration-version', value: 3 });
+  }
+
+  if (version < 4) {
+    const existingTutorials = await tutorialDocuments.findMany({} as any) as any[];
+    for (const item of existingTutorials) {
+      if (!item.experienceStatus) {
+        await tutorialDocuments.update({
+          documentId: item.documentId,
+          data: { experienceStatus: '开放体验' } as any,
+          status: item.publishedAt ? 'published' : 'draft',
+        });
+      }
+    }
+    await migrationStore.set({ key: 'diy-promotion-migration-version', value: 4 });
+  }
+
+  if (version < 5) {
+    for (const slug of ['bread-diy', 'pizza-diy']) {
+      const publishedTutorial = await tutorialDocuments.findFirst({ filters: { slug }, status: 'published' } as any) as any;
+      if (publishedTutorial && !publishedTutorial.experienceStatus) {
+        await tutorialDocuments.update({
+          documentId: publishedTutorial.documentId,
+          data: { experienceStatus: '开放体验' } as any,
+          status: 'published',
+        });
+      }
+    }
+    await migrationStore.set({ key: 'diy-promotion-migration-version', value: 5 });
   }
 }

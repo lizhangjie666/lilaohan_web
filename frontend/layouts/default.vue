@@ -8,7 +8,7 @@ const [{ data: site }, { data: globalSections }] = await Promise.all([
 ])
 const footer = computed(() => globalSections.value?.find(item => item.sectionKey === 'global.footer'))
 const open = ref(false)
-const isDiyLanding = computed(() => route.path === '/diy' || route.path === '/diy/')
+const usesDiyBookingBar = computed(() => /^\/diy\/[^/]+\/?$/.test(route.path))
 watch(() => route.fullPath, () => { open.value = false })
 const nav = [
   { to: '/menu', label: '窑烤菜单' },
@@ -47,7 +47,7 @@ const nav = [
       </div>
     </footer>
 
-    <div v-if="!isDiyLanding" class="fixed inset-x-0 bottom-0 z-50 grid grid-cols-3 border-t border-ink/10 bg-flour p-2 shadow-2xl md:hidden">
+    <div v-if="!usesDiyBookingBar" class="fixed inset-x-0 bottom-0 z-50 grid grid-cols-3 border-t border-ink/10 bg-flour p-2 shadow-2xl md:hidden">
       <a :href="config.public.amapUrl || '/visit'" class="rounded-full px-2 py-3 text-center text-sm font-semibold">地图导航</a>
       <a :href="config.public.phone ? `tel:${config.public.phone}` : '/visit'" class="rounded-full px-2 py-3 text-center text-sm font-semibold">电话咨询</a>
       <NuxtLink to="/visit#wechat" class="rounded-full bg-fire px-2 py-3 text-center text-sm font-semibold text-white">添加微信</NuxtLink>

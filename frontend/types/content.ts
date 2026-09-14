@@ -38,8 +38,6 @@ export interface DiyResourceItem {
 }
 
 export interface DiySetting {
-  price: number
-  priceUnit: string
   doughPerPerson: string
   breadsPerPerson: string
   bookingGift: string
@@ -53,6 +51,7 @@ export interface Tutorial {
   slug: string
   title: string
   type: string
+  experienceStatus: '开放体验' | '内容筹备中'
   summary: string
   duration: string
   people: string

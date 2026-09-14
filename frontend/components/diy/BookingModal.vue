@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { SiteSettings } from '~/types/content'
 
-const props = defineProps<{ site?: SiteSettings | null }>()
+const props = defineProps<{ site?: SiteSettings | null; experienceName?: string }>()
 const { isBookingOpen, closeBooking } = useBooking()
 const closeButton = ref<HTMLButtonElement | null>(null)
 const qrTrigger = ref<HTMLButtonElement | null>(null)
@@ -59,7 +59,7 @@ onBeforeUnmount(() => {
         <section role="dialog" aria-modal="true" aria-labelledby="booking-title" class="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-[2rem] bg-[#fff8e9] p-6 shadow-2xl md:p-10">
           <button ref="closeButton" type="button" class="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full border border-ink/15 text-2xl transition hover:bg-ink hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fire" aria-label="关闭预约窗口" @click="closeBooking">×</button>
           <p class="eyebrow text-fire">BOOK YOUR EXPERIENCE</p>
-          <h2 id="booking-title" class="mt-3 pr-12 font-serif text-4xl font-semibold">预约窑烤面包 DIY</h2>
+          <h2 id="booking-title" class="mt-3 pr-12 font-serif text-4xl font-semibold">预约{{ experienceName || '手作体验' }}</h2>
           <p class="mt-4 leading-8 text-charcoal">请添加门店微信，并说明希望体验的日期和人数。最终安排以门店微信回复为准。</p>
 
           <div v-if="site?.wechat" class="mt-7 rounded-2xl border border-ink/15 bg-white/70 px-5 py-4 text-center">

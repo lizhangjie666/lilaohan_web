@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { mergePageSections, pageSectionDefaults } from '~/data/page-sections'
 
-const { tutorials, spots, settings, pageSections } = useContent()
-const [{ data: tutorialList }, { data: spotList }, { data: site }, { data: sectionList }] = await Promise.all([
-  useAsyncData('home-tutorials', tutorials), useAsyncData('home-spots', spots), useAsyncData('home-settings', settings), useAsyncData('home-sections', () => pageSections('home')),
+const { tutorials, spots, settings, diySettings, pageSections } = useContent()
+const [{ data: tutorialList }, { data: spotList }, { data: site }, { data: diy }, { data: sectionList }] = await Promise.all([
+  useAsyncData('home-tutorials', tutorials), useAsyncData('home-spots', spots), useAsyncData('home-settings', settings), useAsyncData('home-diy-settings', diySettings), useAsyncData('home-sections', () => pageSections('home')),
 ])
 const blocks = computed(() => mergePageSections(sectionList.value, ['home.hero', 'home.menu', 'home.diy', 'home.guide']))
 const menuCategories = computed(() => blocks.value.menu.items.length ? blocks.value.menu.items : pageSectionDefaults['home.menu'].items)
+const featuredDiySlug = computed(() => diy.value?.featuredTutorialSlug || 'bread-diy')
 const heroReady = ref(false)
 const progressBar = ref<HTMLElement | null>(null)
 const heroMedia = ref<HTMLElement | null>(null)
@@ -78,7 +79,9 @@ useHead({ script: [{ type: 'application/ld+json', innerHTML: JSON.stringify({ '@
     </section>
 
     <section class="page-wrap py-20 md:py-32">
-      <div class="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]"><div v-reveal class="reveal-from-left lg:sticky lg:top-28 lg:self-start"><p class="eyebrow">{{ blocks.diy.eyebrow }}</p><h2 class="section-title mt-5 whitespace-pre-line">{{ blocks.diy.title }}</h2><p class="body-copy mt-6 whitespace-pre-line">{{ blocks.diy.description }}</p><NuxtLink v-if="blocks.diy.primaryButtonText" :to="blocks.diy.primaryButtonLink || '/diy'" class="btn-primary mt-8">{{ blocks.diy.primaryButtonText }}</NuxtLink></div><div class="grid gap-6 md:grid-cols-2"><NuxtLink v-for="(item, index) in tutorialList" :key="item.id" v-reveal="100 + index * 110" :to="`/diy/${item.slug}`" class="paper-card group overflow-hidden"><div class="aspect-[4/5] overflow-hidden"><ContentImage :image="item.image" :alt="item.imageAlt" sizes="(min-width: 1024px) 30vw, (min-width: 768px) 50vw, 100vw" class="image-cover transition duration-700 group-hover:scale-[1.05]" /></div><div class="p-6"><p class="eyebrow">{{ item.type }}</p><h3 class="mt-3 font-serif text-2xl font-semibold">{{ item.title }}</h3><p class="mt-4 leading-7 text-charcoal">{{ item.summary }}</p></div></NuxtLink></div></div>
+      <div v-reveal class="flex flex-col justify-between gap-6 md:flex-row md:items-end"><div class="max-w-3xl"><p class="eyebrow">{{ blocks.diy.eyebrow }}</p><h2 class="section-title mt-5 whitespace-pre-line">{{ blocks.diy.title }}</h2><p class="body-copy mt-6 whitespace-pre-line">{{ blocks.diy.description }}</p></div><NuxtLink :to="blocks.diy.primaryButtonLink || '/diy'" class="font-semibold text-fire">{{ blocks.diy.primaryButtonText || '查看全部体验' }} →</NuxtLink></div>
+      <div v-if="tutorialList?.length" class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"><DiyExperienceCard v-for="(item, index) in tutorialList" :key="item.id" v-reveal="index * 90" :tutorial="item" :index="index" :featured="item.slug === featuredDiySlug" /></div>
+      <div v-else class="mt-12 rounded-[1.75rem] border border-ink/10 bg-white p-8 text-center text-charcoal">手作体验正在后台整理中。</div>
     </section>
 
     <section class="bg-lake py-20 text-white md:py-28">
