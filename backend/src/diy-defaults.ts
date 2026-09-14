@@ -78,6 +78,33 @@ const breadTutorial = {
   sortOrder: 0,
 };
 
+const pizzaTutorial = {
+  title: '窑烤披萨 DIY 体验',
+  slug: 'pizza-diy',
+  type: '披萨 DIY',
+  experienceStatus: '开放体验',
+  summary: '擀开面团、挑选配料、亲手铺满，再看它在窑火里快速鼓起。',
+  duration: '时长待确认',
+  people: '亲子、朋友和团建活动，具体安排请添加门店微信咨询。',
+  materials: [
+    { value: '披萨面团' },
+    { value: '当日配料' },
+    { value: '基础制作工具' },
+  ],
+  steps: [
+    { title: '擀开面团', description: '学习把面团整理成适合入窑的形状。' },
+    { title: '铺上配料', description: '按照口味选择当天可用的配料。' },
+    { title: '送入窑炉', description: '由工作人员完成高温窑炉操作。' },
+    { title: '一起分享', description: '出炉后切开品尝，记录自己的成品。' },
+  ],
+  notes: [
+    { value: '配料会随季节和库存调整。' },
+    { value: '高温窑炉区域请听从工作人员指引。' },
+  ],
+  visible: true,
+  sortOrder: 1,
+};
+
 const preparingTutorials = [
   {
     title: '饼干 DIY 体验',
@@ -280,5 +307,39 @@ export async function ensureDefaultDiyContent(strapi: Core.Strapi) {
     }
 
     await migrationStore.set({ key: 'diy-promotion-migration-version', value: 7 });
+  }
+
+  if (version < 8) {
+    const existingPizza = await tutorialDocuments.findFirst({ filters: { slug: 'pizza-diy' } } as any) as any;
+    if (existingPizza) {
+      await tutorialDocuments.update({
+        documentId: existingPizza.documentId,
+        data: {
+          title: existingPizza.title || pizzaTutorial.title,
+          type: existingPizza.type || pizzaTutorial.type,
+          experienceStatus: existingPizza.experienceStatus || pizzaTutorial.experienceStatus,
+          summary: existingPizza.summary || pizzaTutorial.summary,
+          visible: true,
+          sortOrder: 1,
+        } as any,
+        status: 'published',
+      });
+    } else {
+      await tutorialDocuments.create({ data: pizzaTutorial as any, status: 'published' });
+    }
+
+    const finalOrder = ['bread-diy', 'pizza-diy', 'cookie-diy', 'tie-dye'];
+    for (const [sortOrder, slug] of finalOrder.entries()) {
+      const item = await tutorialDocuments.findFirst({ filters: { slug }, status: 'published' } as any) as any;
+      if (item && item.sortOrder !== sortOrder) {
+        await tutorialDocuments.update({
+          documentId: item.documentId,
+          data: { sortOrder } as any,
+          status: 'published',
+        });
+      }
+    }
+
+    await migrationStore.set({ key: 'diy-promotion-migration-version', value: 8 });
   }
 }
