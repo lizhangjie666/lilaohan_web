@@ -89,9 +89,9 @@ const preparingTutorials = [
     sortOrder: 2,
   },
   {
-    title: '扎染体验',
+    title: '蜡染 DIY 体验',
     slug: 'tie-dye',
-    type: '扎染',
+    type: '蜡染 DIY',
     experienceStatus: '内容筹备中',
     summary: '项目内容正在筹备中，具体开放时间与体验安排请添加门店微信咨询。',
     visible: true,
@@ -230,5 +230,55 @@ export async function ensureDefaultDiyContent(strapi: Core.Strapi) {
       }
     }
     await migrationStore.set({ key: 'diy-promotion-migration-version', value: 6 });
+  }
+
+  if (version < 7) {
+    const orderedTutorials = [
+      { slug: 'bread-diy', title: '窑烤面包 DIY 体验', type: '面包 DIY', sortOrder: 0 },
+      { slug: 'pizza-diy', title: '窑烤披萨 DIY 体验', type: '披萨 DIY', sortOrder: 1 },
+      { slug: 'cookie-diy', title: '饼干 DIY 体验', type: '饼干 DIY', sortOrder: 2 },
+      // 保留旧 slug，避免已分享的 /diy/tie-dye 链接失效。
+      { slug: 'tie-dye', title: '蜡染 DIY 体验', type: '蜡染 DIY', sortOrder: 3 },
+    ];
+
+    for (const item of orderedTutorials) {
+      const existing = await tutorialDocuments.findFirst({ filters: { slug: item.slug }, status: 'published' } as any) as any;
+      if (existing) {
+        await tutorialDocuments.update({
+          documentId: existing.documentId,
+          data: { title: item.title, type: item.type, sortOrder: item.sortOrder } as any,
+          status: 'published',
+        });
+      }
+    }
+
+    const prioritySlugs = new Set(orderedTutorials.map(item => item.slug));
+    const otherTutorials = await tutorialDocuments.findMany({
+      filters: { slug: { $notIn: [...prioritySlugs] } },
+      status: 'published',
+      sort: ['sortOrder:asc'],
+    } as any) as any[];
+    for (const [index, item] of otherTutorials.entries()) {
+      await tutorialDocuments.update({
+        documentId: item.documentId,
+        data: { sortOrder: index + orderedTutorials.length } as any,
+        status: 'published',
+      });
+    }
+
+    const publishedBread = await tutorialDocuments.findFirst({
+      filters: { slug: 'bread-diy' },
+      status: 'published',
+    } as any) as any;
+    const currentSetting = await settingDocuments.findFirst({ populate: ['featuredTutorial'] } as any) as any;
+    if (publishedBread && currentSetting?.featuredTutorial?.documentId !== publishedBread.documentId) {
+      await settingDocuments.update({
+        documentId: currentSetting.documentId,
+        data: { featuredTutorial: publishedBread.documentId } as any,
+        status: currentSetting.publishedAt ? 'published' : 'draft',
+      });
+    }
+
+    await migrationStore.set({ key: 'diy-promotion-migration-version', value: 7 });
   }
 }
