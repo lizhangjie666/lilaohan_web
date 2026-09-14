@@ -1,0 +1,11 @@
+{
+  "collectionName": "components_diy_lessons",
+  "info": { "displayName": "教程课程小项" },
+  "attributes": {
+    "title": { "type": "string", "required": true },
+    "description": { "type": "text", "required": true },
+    "image": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "steps": { "type": "component", "component": "shared.text-item", "repeatable": true },
+    "safetyNote": { "type": "text" }
+  }
+}

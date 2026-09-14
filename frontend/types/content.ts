@@ -37,6 +37,25 @@ export interface DiyResourceItem {
   isIllustration?: boolean
 }
 
+export interface TutorialLesson {
+  title: string
+  description: string
+  image?: ImageSource
+  imageAlt: string
+  steps: string[]
+  safetyNote: string
+}
+
+export interface TutorialChapter {
+  anchor: string
+  eyebrow: string
+  title: string
+  summary: string
+  image?: ImageSource
+  imageAlt: string
+  lessons: TutorialLesson[]
+}
+
 export interface DiySetting {
   doughPerPerson: string
   breadsPerPerson: string
@@ -55,10 +74,13 @@ export interface Tutorial {
   summary: string
   duration: string
   people: string
+  detailPrice?: number
+  detailPriceUnit?: string
   materials: string[]
   ingredients: DiyResourceItem[]
   tools: DiyResourceItem[]
   steps: TutorialStep[]
+  tutorialChapters: TutorialChapter[]
   notes: string[]
   image?: ImageSource
   imageAlt: string

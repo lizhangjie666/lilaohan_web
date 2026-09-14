@@ -36,6 +36,8 @@ const contentTypeLocalizations: Record<string, ModelLocalization> = {
     slug: { label: '网址标识', description: '根据体验名称自动生成，用于教程详情页网址。' },
     type: { label: '体验类型', placeholder: '例如：面包DIY、披萨DIY' },
     experienceStatus: { label: '体验状态', description: '只填写“开放体验”或“内容筹备中”。开放体验会显示教程入口；内容筹备中只展示项目介绍和微信咨询。', placeholder: '开放体验' },
+    detailPrice: { label: '详情页价格', description: '仅在该项目的详细介绍页显示；留空时不展示价格。' },
+    detailPriceUnit: { label: '价格单位', placeholder: '例如：元 / 人' },
     summary: { label: '体验简介' },
     duration: { label: '预计时长', placeholder: '例如：约 90 分钟' },
     people: { label: '适合人数', placeholder: '例如：2–8 人' },
@@ -43,6 +45,7 @@ const contentTypeLocalizations: Record<string, ModelLocalization> = {
     ingredients: { label: '提供配料', description: '逐项填写配料名称，可为每项上传真实照片。' },
     tools: { label: '提供工具', description: '逐项填写工具名称，可为每项上传真实照片。' },
     steps: { label: '体验步骤' },
+    tutorialChapters: { label: '章节式教程', description: '用于维护窑炉科普、工具使用和造型教学等教程章节。' },
     notes: { label: '注意事项', description: '点击添加，可填写多条内容。' },
     consultationTip: { label: '咨询提示', placeholder: '例如：周末建议提前通过微信咨询。' },
     videoUrl: { label: '演示视频链接', description: '填写以 https:// 开头的抖音、小红书、视频号、B站或其他视频页面链接。' },
@@ -150,6 +153,21 @@ const componentLocalizations: Record<string, ModelLocalization> = {
   'diy.resource-item': {
     name: { label: '名称', placeholder: '例如：蔓越莓干或擀面杖' },
     image: { label: '真实照片', description: '没有照片时官网显示统一品牌占位。' },
+  },
+  'diy.tutorial-chapter': {
+    anchor: { label: '章节锚点', description: '使用小写英文和短横线，例如 oven、tools、shaping。' },
+    eyebrow: { label: '章节英文小标题' },
+    title: { label: '章节标题' },
+    summary: { label: '章节简介' },
+    image: { label: '章节封面图片' },
+    lessons: { label: '课程小项' },
+  },
+  'diy.lesson': {
+    title: { label: '课程标题' },
+    description: { label: '课程说明' },
+    image: { label: '课程图片' },
+    steps: { label: '操作步骤', description: '按顺序逐条添加；科普内容可以留空。' },
+    safetyNote: { label: '安全提示或补充说明' },
   },
   'shared.seo': {
     metaTitle: { label: '搜索标题', description: '建议不超过 60 个字。' },

@@ -1,5 +1,5 @@
 import { fallbackProducts, fallbackSettings, fallbackSpots, fallbackTutorials } from '~/data/fallback'
-import type { DiyResourceItem, DiySetting, FAQ, ImageAsset, ImageSource, PageSection, PageSectionItem, PhotoSpot, Product, SiteSettings, Story, StoryStage, Tutorial, TutorialStep } from '~/types/content'
+import type { DiyResourceItem, DiySetting, FAQ, ImageAsset, ImageSource, PageSection, PageSectionItem, PhotoSpot, Product, SiteSettings, Story, StoryStage, Tutorial, TutorialChapter, TutorialLesson, TutorialStep } from '~/types/content'
 
 type RawRecord = Record<string, any>
 type Entity = RawRecord & { id?: number; attributes?: RawRecord }
@@ -147,6 +147,31 @@ function normalizeDiyResource(value: RawRecord, mediaBase = ''): DiyResourceItem
   }
 }
 
+function normalizeTutorialLesson(value: RawRecord, mediaBase = ''): TutorialLesson {
+  const title = String(value.title || '')
+  return {
+    title,
+    description: String(value.description || ''),
+    image: mediaAsset(value.image, mediaBase, `${title || '教程课程'}图片`),
+    imageAlt: mediaAlt(value.image) || `${title || '教程课程'}图片`,
+    steps: textItems(value.steps),
+    safetyNote: String(value.safetyNote || ''),
+  }
+}
+
+function normalizeTutorialChapter(value: RawRecord, mediaBase = ''): TutorialChapter {
+  const title = String(value.title || '')
+  return {
+    anchor: String(value.anchor || '').replace(/[^a-z0-9-]/g, ''),
+    eyebrow: String(value.eyebrow || ''),
+    title,
+    summary: String(value.summary || ''),
+    image: mediaAsset(value.image, mediaBase, `${title || '教程章节'}图片`),
+    imageAlt: mediaAlt(value.image) || `${title || '教程章节'}图片`,
+    lessons: Array.isArray(value.lessons) ? value.lessons.map((lesson: RawRecord) => normalizeTutorialLesson(lesson, mediaBase)) : [],
+  }
+}
+
 function normalizeTutorial(entity: Entity, mediaBase = ''): Tutorial {
   const item = flatten(entity)
   return {
@@ -158,10 +183,13 @@ function normalizeTutorial(entity: Entity, mediaBase = ''): Tutorial {
     summary: String(item.summary || ''),
     duration: String(item.duration || ''),
     people: String(item.people || ''),
+    detailPrice: Number.isFinite(Number(item.detailPrice)) && item.detailPrice !== null && item.detailPrice !== '' ? Number(item.detailPrice) : undefined,
+    detailPriceUnit: String(item.detailPriceUnit || ''),
     materials: textItems(item.materials),
     ingredients: Array.isArray(item.ingredients) ? item.ingredients.map((entry: RawRecord) => normalizeDiyResource(entry, mediaBase)) : [],
     tools: Array.isArray(item.tools) ? item.tools.map((entry: RawRecord) => normalizeDiyResource(entry, mediaBase)) : [],
     steps: Array.isArray(item.steps) ? item.steps.map((step: RawRecord) => normalizeStep(step, mediaBase)) : [],
+    tutorialChapters: Array.isArray(item.tutorialChapters) ? item.tutorialChapters.map((chapter: RawRecord) => normalizeTutorialChapter(chapter, mediaBase)) : [],
     notes: textItems(item.notes),
     image: mediaSource(item.image, mediaBase, String(item.title || '手作体验图片')),
     imageAlt: mediaAlt(item.image) || String(item.title || '手作体验图片'),
@@ -360,7 +388,7 @@ export function useContent() {
       'diy-tutorials',
       entity => normalizeTutorial(entity, mediaBase),
       fallbackTutorials,
-      'populate[image]=true&populate[materials]=true&populate[notes]=true&populate[steps][populate][image]=true&populate[ingredients][populate][image]=true&populate[tools][populate][image]=true',
+      'populate[image]=true&populate[materials]=true&populate[notes]=true&populate[steps][populate][image]=true&populate[ingredients][populate][image]=true&populate[tools][populate][image]=true&populate[tutorialChapters][populate][image]=true&populate[tutorialChapters][populate][lessons][populate][image]=true&populate[tutorialChapters][populate][lessons][populate][steps]=true',
     ),
     diySettings: () => getSingle('diy-setting', normalizeDiySetting, defaultDiySetting),
     spots: () => getCollection('photo-spots', entity => normalizeSpot(entity, mediaBase), fallbackSpots),

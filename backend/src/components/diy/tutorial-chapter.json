@@ -1,0 +1,12 @@
+{
+  "collectionName": "components_diy_tutorial_chapters",
+  "info": { "displayName": "教程章节" },
+  "attributes": {
+    "anchor": { "type": "string", "required": true, "regex": "^[a-z0-9-]+$" },
+    "eyebrow": { "type": "string" },
+    "title": { "type": "string", "required": true },
+    "summary": { "type": "text" },
+    "image": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "lessons": { "type": "component", "component": "diy.lesson", "repeatable": true }
+  }
+}

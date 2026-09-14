@@ -11,7 +11,7 @@ const props = withDefaults(defineProps<{
 })
 
 const isPreparing = computed(() => props.tutorial.experienceStatus === '内容筹备中')
-const hasTutorial = computed(() => !isPreparing.value && props.tutorial.steps.length > 0)
+const hasTutorial = computed(() => !isPreparing.value && (props.tutorial.steps.length > 0 || props.tutorial.tutorialChapters.length > 0))
 const cardNumber = computed(() => String(props.index + 1).padStart(2, '0'))
 const sizeClass = computed(() => ({
   featured: 'min-h-[32rem] sm:min-h-[38rem] lg:min-h-[39rem]',

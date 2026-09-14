@@ -3,7 +3,7 @@ import type { Tutorial } from '~/types/content'
 
 const props = defineProps<{ tutorial: Tutorial; index?: number; featured?: boolean }>()
 const isPreparing = computed(() => props.tutorial.experienceStatus === '内容筹备中')
-const hasTutorial = computed(() => !isPreparing.value && props.tutorial.steps.length > 0)
+const hasTutorial = computed(() => !isPreparing.value && (props.tutorial.steps.length > 0 || props.tutorial.tutorialChapters.length > 0))
 </script>
 
 <template>
