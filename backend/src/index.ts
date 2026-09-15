@@ -9,6 +9,7 @@ import {
 } from './admin-localization';
 import { ensureDefaultPageSections } from './page-section-defaults';
 import { ensureDefaultDiyContent } from './diy-defaults';
+import { ensureConfirmedSiteContact } from './site-setting-defaults';
 import { registerOvenOrderAdmin } from './oven-order-admin';
 import { assertOvenPhoneEncryptionConfigured, ensureOvenOrderCounter, purgeExpiredOvenPhones, syncOverdueOvenOrders } from './oven-orders';
 
@@ -46,6 +47,7 @@ export default {
     });
     await ensureDefaultPageSections(strapi);
     await ensureDefaultDiyContent(strapi);
+    await ensureConfirmedSiteContact(strapi);
     await localizeAdminContent(strapi);
     await configureChineseEditorRole(strapi);
     await configurePublicReadPermissions(strapi);

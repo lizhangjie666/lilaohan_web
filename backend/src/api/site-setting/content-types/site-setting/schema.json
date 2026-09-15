@@ -24,6 +24,7 @@
     "wechatQr": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
     "amapUrl": { "type": "string", "regex": "^https?://" },
     "baiduMapUrl": { "type": "string", "regex": "^https?://" },
+    "xiaohongshuGuideUrl": { "type": "string", "regex": "^https?://" },
     "parking": { "type": "text" },
     "notice": { "type": "text" },
     "socialLinks": { "type": "json" },

@@ -133,6 +133,7 @@ export interface SiteSettings {
   wechatQrAlt: string
   amapUrl: string
   baiduMapUrl: string
+  xiaohongshuGuideUrl: string
   parking: string
   notice: string
 }

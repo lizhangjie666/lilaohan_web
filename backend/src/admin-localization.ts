@@ -139,6 +139,7 @@ const contentTypeLocalizations: Record<string, ModelLocalization> = {
     wechatQr: { label: '微信二维码' },
     amapUrl: { label: '高德地图链接' },
     baiduMapUrl: { label: '百度地图链接' },
+    xiaohongshuGuideUrl: { label: '小红书到店指引链接', description: '填写完整的 https:// 小红书笔记链接。' },
     parking: { label: '停车与交通提示' },
     notice: { label: '临时营业提示' },
     socialLinks: { label: '社交账号链接', description: '填写抖音、小红书、视频号等公开账号链接。' },

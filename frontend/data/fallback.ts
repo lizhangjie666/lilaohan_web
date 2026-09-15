@@ -27,11 +27,12 @@ export const fallbackSettings: SiteSettings = {
   address: '贵州省贵阳市花溪区镇山村（门牌号待店主确认）',
   hours: '营业时间待店主确认',
   phone: '',
-  wechat: '',
+  wechat: 'lilaohanmianbao_',
   wechatQr: '',
   wechatQrAlt: '李老汉窑烤面包微信二维码',
   amapUrl: '',
   baiduMapUrl: '',
+  xiaohongshuGuideUrl: 'https://xhslink.cn/o/9EYStbt8Pvo',
   parking: '停车及进村路线待店主确认',
   notice: '官网试运行中，产品供应与营业安排请以门店当天信息为准。',
 }
