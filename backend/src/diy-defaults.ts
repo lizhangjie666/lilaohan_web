@@ -83,6 +83,8 @@ const pizzaTutorial = {
   slug: 'pizza-diy',
   type: '披萨 DIY',
   experienceStatus: '开放体验',
+  detailPrice: 98,
+  detailPriceUnit: '元 / 人',
   summary: '擀开面团、挑选配料、亲手铺满，再看它在窑火里快速鼓起。',
   duration: '时长待确认',
   people: '亲子、朋友和团建活动，具体安排请添加门店微信咨询。',
@@ -341,5 +343,20 @@ export async function ensureDefaultDiyContent(strapi: Core.Strapi) {
     }
 
     await migrationStore.set({ key: 'diy-promotion-migration-version', value: 8 });
+  }
+
+  if (version < 9) {
+    const publishedPizza = await tutorialDocuments.findFirst({
+      filters: { slug: 'pizza-diy' },
+      status: 'published',
+    } as any) as any;
+    if (publishedPizza) {
+      await tutorialDocuments.update({
+        documentId: publishedPizza.documentId,
+        data: { detailPrice: 98, detailPriceUnit: '元 / 人' } as any,
+        status: 'published',
+      });
+    }
+    await migrationStore.set({ key: 'diy-promotion-migration-version', value: 9 });
   }
 }
