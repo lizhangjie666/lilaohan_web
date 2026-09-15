@@ -45,6 +45,7 @@
 ## 动态部署
 
 - 主页微信访问二维码下载页为 `/qr/home`，二维码文件为 `/images/homepage-qr-ip-v1.png` 和 `/images/homepage-qr-ip-v1.svg`。当前文件只用于 `http://122.51.118.103/` 的 IP 验收。
+- 面包进度查询二维码下载页为 `/qr/oven`，二维码指向 `/oven/today`；高清文件为 `/images/oven-progress-qr-ip-v1.png` 和 `/images/oven-progress-qr-ip-v1.svg`。
 - 重新生成二维码时，在 `frontend` 运行 `npm run generate:homepage-qr`；可通过 `HOMEPAGE_QR_URL` 与 `HOMEPAGE_QR_VERSION` 指定新地址和新版本。绑定备案域名并启用 HTTPS 后必须使用新版本文件名，避免一年期图片缓存和已印刷旧地址混淆。
 
 - 复制 `deploy/.env.example` 为 `deploy/.env`，填写域名、数据库密码和随机密钥。
