@@ -24,6 +24,9 @@ const statusText: Record<Status, string> = {
 };
 
 const ordersEndpoint = '/admin/oven-orders';
+const uploadTargetBytes = 4 * 1024 * 1024;
+const uploadMaxEdge = 2000;
+const acceptedPhotoTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
 const styles: Record<string, React.CSSProperties> = {
   page: { minHeight: '100%', background: '#f6f6f9', padding: '32px' },
@@ -57,6 +60,36 @@ function apiError(error: any) {
 function imageUrl(media: Media) {
   if (!media?.url) return '';
   return /^https?:/.test(media.url) ? media.url : `${window.location.origin}${media.url}`;
+}
+
+async function prepareOvenPhoto(file: File): Promise<File> {
+  if (!acceptedPhotoTypes.includes(file.type)) throw new Error('仅支持 JPG、PNG 或 WebP 图片。');
+  if (file.size <= uploadTargetBytes) return file;
+
+  const bitmap = await createImageBitmap(file);
+  try {
+    let scale = Math.min(1, uploadMaxEdge / Math.max(bitmap.width, bitmap.height));
+    for (let resizePass = 0; resizePass < 4; resizePass += 1) {
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+      canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('浏览器暂时无法处理这张照片。');
+      context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+
+      for (const quality of [0.88, 0.78, 0.68, 0.58]) {
+        const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+        if (blob && blob.size <= uploadTargetBytes) {
+          const basename = file.name.replace(/\.[^.]+$/, '') || 'oven-photo';
+          return new File([blob], `${basename}.jpg`, { type: 'image/jpeg', lastModified: Date.now() });
+        }
+      }
+      scale *= 0.78;
+    }
+  } finally {
+    bitmap.close();
+  }
+  throw new Error('照片压缩后仍然过大，请换一张照片后重试。');
 }
 
 function progress(order: Order, now: number) {
@@ -96,10 +129,11 @@ function OrderCard({ order, now, onUpdate }: { order: Order; now: number; onUpda
   async function upload() {
     if (!before && !after) return;
     setBusy(true); setMessage('');
-    const body = new FormData();
-    if (before) body.append('beforeImage', before);
-    if (after) body.append('afterImage', after);
     try {
+      setMessage('正在压缩并上传照片…');
+      const body = new FormData();
+      if (before) body.append('beforeImage', await prepareOvenPhoto(before));
+      if (after) body.append('afterImage', await prepareOvenPhoto(after));
       const response = await post(`${ordersEndpoint}/${order.documentId}/images`, body);
       onUpdate(response.data.data); setBefore(null); setAfter(null); setMessage('照片已保存。');
     } catch (error) { setMessage(apiError(error)); }
@@ -189,8 +223,8 @@ export default function OvenOrders() {
   async function create(event: React.FormEvent) {
     event.preventDefault(); setBusy(true); setError('');
     const body = new FormData(); body.append('customerName', name); body.append('phone', phone);
-    if (before) body.append('beforeImage', before);
     try {
+      if (before) body.append('beforeImage', await prepareOvenPhoto(before));
       const response = await post(ordersEndpoint, body);
       calibrate(response.data.data);
       setOrders(current => [response.data.data, ...current]); setName(''); setPhone(''); setBefore(null);
@@ -212,7 +246,7 @@ export default function OvenOrders() {
         <form style={styles.form} onSubmit={create}>
           <label style={styles.label}>顾客姓名<input style={styles.input} value={name} maxLength={30} required onChange={event => setName(event.target.value)} /></label>
           <label style={styles.label}>联系电话<input style={styles.input} value={phone} inputMode="tel" required onChange={event => setPhone(event.target.value)} /></label>
-          <label style={styles.label}>入炉前照片（可选）<input type="file" accept="image/jpeg,image/png,image/webp" onChange={event => setBefore(event.target.files?.[0] || null)} /></label>
+          <label style={styles.label}>入炉前照片（可选）<input type="file" accept="image/jpeg,image/png,image/webp" onChange={event => setBefore(event.target.files?.[0] || null)} /><small style={styles.meta}>超过4MB会在浏览器中自动压缩后上传</small></label>
           <button style={styles.primary} disabled={busy} type="submit">{busy ? '登记中…' : '登记并开始90分钟'}</button>
         </form>
         {error && <p role="alert" style={{ color: '#b42318', marginBottom: 0 }}>{error}</p>}
