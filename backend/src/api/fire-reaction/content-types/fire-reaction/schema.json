@@ -1,0 +1,21 @@
+{
+  "kind": "collectionType",
+  "collectionName": "fire_reactions",
+  "info": {
+    "singularName": "fire-reaction",
+    "pluralName": "fire-reactions",
+    "displayName": "添柴记录",
+    "description": "匿名访客为同炉作品添加的火苗记录"
+  },
+  "options": { "draftAndPublish": false },
+  "attributes": {
+    "creation": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::bread-creation.bread-creation",
+      "inversedBy": "reactions",
+      "required": true
+    },
+    "reactionKey": { "type": "string", "private": true, "unique": true, "required": true }
+  }
+}

@@ -9,6 +9,36 @@ type FieldText = {
 type ModelLocalization = Record<string, FieldText>;
 
 const contentTypeLocalizations: Record<string, ModelLocalization> = {
+  'api::oven-batch.oven-batch': {
+    batchNumber: { label: '炉号', description: '第一次请填写炉号，例如 086；以后新建时留空会自动递增。创建后不能修改。' },
+    batchDate: { label: '制作日期', description: '留空时自动使用创建当天。' },
+    status: { label: '炉次状态', description: 'preparing 制作中；baking 烘烤中；ready 已出炉；finished 已结束。' },
+    creations: { label: '这一炉的作品' },
+    events: { label: '体验统计事件' },
+  },
+  'api::bread-creation.bread-creation': {
+    batch: { label: '所属炉次' },
+    nickname: { label: '面包师昵称' },
+    breadName: { label: '面包名字' },
+    beforeImage: { label: '入窑前照片' },
+    afterImage: { label: '出炉后照片' },
+    fireCount: { label: '收到的柴火数', description: '由系统自动统计，通常不需要手动修改。' },
+    ownerTokenHash: { label: '作品凭证摘要', description: '系统安全字段，请勿修改。' },
+    visible: { label: '作品墙显示', description: '关闭后作品会立即从公众页面隐藏。' },
+    reactions: { label: '添柴记录' },
+    events: { label: '体验统计事件' },
+  },
+  'api::fire-reaction.fire-reaction': {
+    creation: { label: '对应作品' },
+    reactionKey: { label: '匿名去重摘要' },
+  },
+  'api::oven-event.oven-event': {
+    eventType: { label: '事件类型' },
+    anonymousHash: { label: '匿名访客摘要' },
+    eventKey: { label: '事件去重摘要' },
+    batch: { label: '对应炉次' },
+    creation: { label: '对应作品' },
+  },
   'api::product.product': {
     name: { label: '产品名称', placeholder: '例如：柴火窑烤乡村面包' },
     slug: { label: '网址标识', description: '根据产品名称自动生成，用于产品详情页网址。' },
@@ -189,6 +219,12 @@ const componentLocalizations: Record<string, ModelLocalization> = {
 };
 
 const editableContentTypes = Object.keys(contentTypeLocalizations);
+const editorContentTypes = editableContentTypes.filter(
+  (uid) => !['api::fire-reaction.fire-reaction', 'api::oven-event.oven-event'].includes(uid),
+);
+const publicReadableContentTypes = editorContentTypes.filter(
+  (uid) => !['api::oven-batch.oven-batch', 'api::bread-creation.bread-creation'].includes(uid),
+);
 
 function applyFieldTexts(configuration: any, fields: ModelLocalization) {
   const metadatas = { ...(configuration.metadatas ?? {}) };
@@ -330,7 +366,7 @@ export async function configureChineseEditorRole(strapi: Core.Strapi) {
     .values()
     .filter((action: any) => action.section === 'contentTypes');
   const restrictedSubjects = Object.keys(strapi.contentTypes).filter(
-    (uid) => !editableContentTypes.includes(uid),
+    (uid) => !editorContentTypes.includes(uid),
   );
   const contentPermissions = adminContentTypeService.getPermissionsWithNestedFields(contentActions, {
     restrictedSubjects,
@@ -357,7 +393,7 @@ export async function configurePublicReadPermissions(strapi: Core.Strapi) {
   }
 
   const readableActions = new Set(
-    editableContentTypes.flatMap((uid) => [`${uid}.find`, `${uid}.findOne`]),
+    publicReadableContentTypes.flatMap((uid) => [`${uid}.find`, `${uid}.findOne`]),
   );
   const isManagedAction = (action: string) =>
     editableContentTypes.some((uid) => action.startsWith(`${uid}.`));

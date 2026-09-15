@@ -14,6 +14,14 @@
     reverse_proxy backend:1337
   }
 
+  # 顾客投稿接口只接收压缩后的单张图片，代理层先拒绝异常大的请求。
+  handle /api/oven/* {
+    request_body {
+      max_size 6MB
+    }
+    reverse_proxy backend:1337
+  }
+
   handle /api/* {
     reverse_proxy backend:1337
   }

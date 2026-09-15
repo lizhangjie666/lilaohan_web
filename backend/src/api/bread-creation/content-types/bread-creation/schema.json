@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "bread_creations",
+  "info": {
+    "singularName": "bread-creation",
+    "pluralName": "bread-creations",
+    "displayName": "同炉作品",
+    "description": "顾客提交的入窑前与出炉后面包档案"
+  },
+  "options": { "draftAndPublish": false },
+  "attributes": {
+    "batch": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::oven-batch.oven-batch",
+      "inversedBy": "creations",
+      "required": true
+    },
+    "nickname": { "type": "string", "required": true, "maxLength": 20 },
+    "breadName": { "type": "string", "required": true, "maxLength": 30 },
+    "beforeImage": { "type": "media", "multiple": false, "allowedTypes": ["images"], "required": true },
+    "afterImage": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "fireCount": { "type": "integer", "default": 0, "min": 0, "required": true },
+    "ownerTokenHash": { "type": "string", "private": true, "required": true },
+    "visible": { "type": "boolean", "default": true, "required": true },
+    "reactions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::fire-reaction.fire-reaction",
+      "mappedBy": "creation"
+    },
+    "events": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::oven-event.oven-event",
+      "mappedBy": "creation"
+    }
+  }
+}

@@ -23,6 +23,7 @@ useSeoMeta({
 
 <template>
   <div class="min-h-screen bg-[#f5ead9]">
+    <OvenTodayOvenBanner />
     <section class="overflow-hidden border-b border-ink/10 pb-16 pt-10 md:pb-24 md:pt-14">
       <div class="page-wrap">
         <header class="grid gap-7 border-b border-ink/15 pb-9 lg:grid-cols-[1.15fr_.85fr] lg:items-end" v-reveal>

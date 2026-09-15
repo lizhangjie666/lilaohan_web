@@ -8,7 +8,7 @@ const [{ data: site }, { data: globalSections }] = await Promise.all([
 ])
 const footer = computed(() => globalSections.value?.find(item => item.sectionKey === 'global.footer'))
 const open = ref(false)
-const usesDiyBookingBar = computed(() => /^\/diy\/[^/]+\/?$/.test(route.path))
+const usesDiyBookingBar = computed(() => /^\/diy\/[^/]+\/?$/.test(route.path) || route.path.startsWith('/oven/'))
 watch(() => route.fullPath, () => { open.value = false })
 const nav = [
   { to: '/menu', label: '窑烤菜单' },

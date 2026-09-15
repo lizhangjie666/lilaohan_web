@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "oven_events",
+  "info": {
+    "singularName": "oven-event",
+    "pluralName": "oven-events",
+    "displayName": "同炉体验统计",
+    "description": "不保存真实身份和IP的轻量体验事件"
+  },
+  "options": { "draftAndPublish": false },
+  "attributes": {
+    "eventType": {
+      "type": "enumeration",
+      "enum": ["diy_view", "oven_wall_view", "creation_submitted", "fire_added", "after_image_uploaded"],
+      "required": true
+    },
+    "anonymousHash": { "type": "string", "private": true },
+    "eventKey": { "type": "string", "private": true, "unique": true },
+    "batch": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::oven-batch.oven-batch",
+      "inversedBy": "events"
+    },
+    "creation": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::bread-creation.bread-creation",
+      "inversedBy": "events"
+    }
+  }
+}

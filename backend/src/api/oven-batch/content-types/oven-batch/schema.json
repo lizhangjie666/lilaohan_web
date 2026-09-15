@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "oven_batches",
+  "info": {
+    "singularName": "oven-batch",
+    "pluralName": "oven-batches",
+    "displayName": "今日同炉",
+    "description": "管理每天的窑炉批次和出炉状态"
+  },
+  "options": { "draftAndPublish": false },
+  "attributes": {
+    "batchNumber": { "type": "integer", "min": 1, "unique": true },
+    "batchDate": { "type": "date" },
+    "status": {
+      "type": "enumeration",
+      "enum": ["preparing", "baking", "ready", "finished"],
+      "default": "preparing",
+      "required": true
+    },
+    "creations": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::bread-creation.bread-creation",
+      "mappedBy": "batch"
+    },
+    "events": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::oven-event.oven-event",
+      "mappedBy": "batch"
+    }
+  }
+}
