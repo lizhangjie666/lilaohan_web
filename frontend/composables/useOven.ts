@@ -1,5 +1,5 @@
 import type { ImageAsset } from '~/types/content'
-import type { BreadCreationPublic, CreateBreadInput, OvenBatchPublic } from '~/types/oven'
+import type { BreadCreationPublic, OvenBatchPublic, OvenOrderPublic } from '~/types/oven'
 
 type RawMedia = {
   url?: string
@@ -11,7 +11,6 @@ type RawMedia = {
 }
 
 const VISITOR_KEY = 'lilaohan_oven_visitor_v1'
-const OWNER_KEY = 'lilaohan_oven_owners_v1'
 
 function randomId() {
   if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID().replace(/-/g, '')
@@ -68,6 +67,14 @@ export function useOven() {
     }
   }
 
+  function normalizeOrder(raw: any): OvenOrderPublic {
+    return {
+      ...raw,
+      beforeImage: imageAsset(raw.beforeImage),
+      afterImage: imageAsset(raw.afterImage),
+    }
+  }
+
   async function request<T>(path: string, options: any = {}): Promise<T> {
     return await $fetch<T>(`${apiBase}/api/oven${path}`, { timeout: 15000, ...options })
   }
@@ -82,27 +89,20 @@ export function useOven() {
     return value
   }
 
-  function saveOwnerToken(documentId: string, token: string) {
-    if (!import.meta.client) return
-    let values: Record<string, string> = {}
-    try { values = JSON.parse(localStorage.getItem(OWNER_KEY) || '{}') } catch {}
-    values[documentId] = token
-    localStorage.setItem(OWNER_KEY, JSON.stringify(values))
-  }
-
-  function ownerToken(documentId: string) {
-    if (!import.meta.client) return ''
-    try {
-      const values = JSON.parse(localStorage.getItem(OWNER_KEY) || '{}')
-      return String(values[documentId] || '')
-    } catch {
-      return ''
-    }
-  }
-
   return {
     visitorId,
-    ownerToken,
+
+    async lookupOrder(serialNumber: string, phoneLast4: string) {
+      try {
+        const result = await request<{ data: any }>('/orders/lookup', {
+          method: 'POST',
+          body: { serialNumber, phoneLast4 },
+        })
+        return normalizeOrder(result.data)
+      } catch (error) {
+        throw new Error(errorMessage(error, '暂时无法查询，请稍后重试。'))
+      }
+    },
 
     async today() {
       const result = await request<{ data: any | null }>('/today')
@@ -117,50 +117,6 @@ export function useOven() {
     async creation(documentId: string) {
       const result = await request<{ data: any }>(`/creations/${encodeURIComponent(documentId)}`)
       return normalizeCreation(result.data)
-    },
-
-    async createCreation(input: CreateBreadInput) {
-      const body = new FormData()
-      body.append('nickname', input.nickname)
-      body.append('breadName', input.breadName)
-      body.append('consent', String(input.consent))
-      body.append('beforeImage', input.beforeImage, input.beforeImage.name)
-      try {
-        const result = await request<{ data: any; ownerToken: string }>('/creations', { method: 'POST', body })
-        saveOwnerToken(result.data.documentId, result.ownerToken)
-        return normalizeCreation(result.data)
-      } catch (error) {
-        throw new Error(errorMessage(error, '作品暂时没有提交成功，请稍后重试。'))
-      }
-    },
-
-    async addFire(documentId: string) {
-      try {
-        const result = await request<{ data: { fireCount: number; added: boolean; alreadyAdded: boolean } }>(
-          `/creations/${encodeURIComponent(documentId)}/fire`,
-          { method: 'POST', body: { anonymousId: visitorId() } },
-        )
-        return result.data
-      } catch (error) {
-        throw new Error(errorMessage(error, '暂时没有添柴成功，请稍后重试。'))
-      }
-    },
-
-    async uploadAfterImage(documentId: string, image: File) {
-      const token = ownerToken(documentId)
-      if (!token) throw new Error('请使用最初提交作品的浏览器上传出炉照片。')
-      const body = new FormData()
-      body.append('ownerToken', token)
-      body.append('afterImage', image, image.name)
-      try {
-        const result = await request<{ data: any }>(
-          `/creations/${encodeURIComponent(documentId)}/after-image`,
-          { method: 'POST', body },
-        )
-        return normalizeCreation(result.data)
-      } catch (error) {
-        throw new Error(errorMessage(error, '出炉照片暂时没有保存成功，请稍后重试。'))
-      }
     },
 
     async track(eventType: 'diy_view' | 'oven_wall_view', batchNumber?: string) {

@@ -33,6 +33,7 @@ services:
       IS_PROXIED: "true"
       OVEN_OWNER_TOKEN_SECRET: ${OVEN_OWNER_TOKEN_SECRET}
       OVEN_ANONYMOUS_ID_SALT: ${OVEN_ANONYMOUS_ID_SALT}
+      OVEN_PHONE_ENCRYPTION_KEY: ${OVEN_PHONE_ENCRYPTION_KEY}
     depends_on:
       database:
         condition: service_healthy

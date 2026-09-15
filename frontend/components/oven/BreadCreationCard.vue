@@ -6,32 +6,8 @@ const props = defineProps<{
   batchNumber: string
   status: OvenBatchStatus
   highlighted?: boolean
+  readonly?: boolean
 }>()
-const emit = defineEmits<{ fire: [documentId: string, fireCount: number] }>()
-
-const { addFire } = useOven()
-const fireCount = ref(props.creation.fireCount)
-const loading = ref(false)
-const message = ref('')
-const canReact = computed(() => props.status !== 'finished')
-
-watch(() => props.creation.fireCount, value => { fireCount.value = value })
-
-async function handleFire() {
-  if (!canReact.value || loading.value) return
-  loading.value = true
-  message.value = ''
-  try {
-    const result = await addFire(props.creation.documentId)
-    fireCount.value = result.fireCount
-    message.value = result.added ? '这一把柴，添上了。' : '你已经为它添过柴了。'
-    emit('fire', props.creation.documentId, result.fireCount)
-  } catch (error: any) {
-    message.value = error.message
-  } finally {
-    loading.value = false
-  }
-}
 </script>
 
 <template>
@@ -60,15 +36,9 @@ async function handleFire() {
     </NuxtLink>
     <div class="px-5 pb-5">
       <div class="flex items-center justify-between gap-3 border-t border-ink/10 pt-4">
-        <span class="font-serif text-xl font-semibold text-fire" :aria-label="`${fireCount}把柴`">🔥 {{ fireCount }}</span>
-        <button
-          type="button"
-          class="min-h-11 rounded-full border border-fire/30 px-4 py-2 text-sm font-semibold text-fire transition hover:bg-fire hover:text-white disabled:cursor-not-allowed disabled:border-ink/10 disabled:text-charcoal/50"
-          :disabled="!canReact || loading"
-          @click="handleFire"
-        >{{ status === 'finished' ? '这一炉已结束' : loading ? '添柴中…' : '添一把柴 🔥' }}</button>
+        <span class="font-serif text-xl font-semibold text-fire" :aria-label="`${creation.fireCount}把柴`">🔥 {{ creation.fireCount }}</span>
+        <span class="text-sm text-charcoal">历史作品</span>
       </div>
-      <p v-if="message" class="mt-3 text-xs leading-5 text-charcoal" role="status">{{ message }}</p>
     </div>
   </article>
 </template>

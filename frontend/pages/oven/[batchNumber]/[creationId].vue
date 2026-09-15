@@ -1,7 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
-const { creation: getCreation, addFire, uploadAfterImage, ownerToken } = useOven()
-const { compressGuestImage } = useGuestImage()
+const { creation: getCreation } = useOven()
 const creationId = computed(() => String(route.params.creationId || ''))
 const routeBatch = computed(() => String(route.params.batchNumber || '').padStart(3, '0'))
 const { data: creation, error } = await useAsyncData(
@@ -11,16 +10,6 @@ const { data: creation, error } = await useAsyncData(
 if (error.value || (creation.value && creation.value.batch.batchNumber !== routeBatch.value)) {
   throw createError({ statusCode: 404, statusMessage: '没有找到这个面包档案' })
 }
-
-const isOwner = ref(false)
-const fireLoading = ref(false)
-const uploadLoading = ref(false)
-const message = ref('')
-const uploadError = ref('')
-const afterPreview = ref('')
-const afterFile = ref<File>()
-const canReact = computed(() => creation.value?.batch.status !== 'finished')
-const canUploadAfter = computed(() => creation.value?.batch.status === 'ready' && isOwner.value)
 
 const formattedDate = computed(() => {
   const value = creation.value?.batch.batchDate
@@ -33,57 +22,6 @@ useSeoMeta({
   description: () => creation.value ? `${creation.value.nickname}在贵阳镇山村制作的“${creation.value.breadName}”窑烤面包档案。` : '',
 })
 
-onMounted(() => { isOwner.value = Boolean(ownerToken(creationId.value)) })
-
-async function handleFire() {
-  if (!creation.value || fireLoading.value) return
-  fireLoading.value = true
-  message.value = ''
-  try {
-    const result = await addFire(creation.value.documentId)
-    creation.value.fireCount = result.fireCount
-    message.value = result.added ? '这一把柴，添上了。' : '你已经为它添过柴了。'
-  } catch (error: any) {
-    message.value = error.message
-  } finally {
-    fireLoading.value = false
-  }
-}
-
-async function chooseAfterImage(event: Event) {
-  const input = event.target as HTMLInputElement
-  const selected = input.files?.[0]
-  if (!selected) return
-  uploadError.value = ''
-  try {
-    const compressed = await compressGuestImage(selected)
-    if (afterPreview.value) URL.revokeObjectURL(afterPreview.value)
-    afterFile.value = compressed
-    afterPreview.value = URL.createObjectURL(compressed)
-  } catch (error: any) {
-    uploadError.value = error.message
-    input.value = ''
-  }
-}
-
-async function submitAfterImage() {
-  if (!creation.value || !afterFile.value || uploadLoading.value) return
-  uploadLoading.value = true
-  uploadError.value = ''
-  try {
-    creation.value = await uploadAfterImage(creation.value.documentId, afterFile.value)
-    message.value = '出炉后的模样已经收进面包档案。'
-    afterFile.value = undefined
-    if (afterPreview.value) URL.revokeObjectURL(afterPreview.value)
-    afterPreview.value = ''
-  } catch (error: any) {
-    uploadError.value = error.message
-  } finally {
-    uploadLoading.value = false
-  }
-}
-
-onBeforeUnmount(() => { if (afterPreview.value) URL.revokeObjectURL(afterPreview.value) })
 </script>
 
 <template>
@@ -108,8 +46,7 @@ onBeforeUnmount(() => { if (afterPreview.value) URL.revokeObjectURL(afterPreview
           <h1 class="mt-4 font-serif text-5xl font-semibold leading-tight sm:text-6xl">《{{ creation.breadName }}》</h1>
           <p class="mt-4 text-lg text-charcoal">面包师：{{ creation.nickname }}</p>
           <p class="mt-6 font-serif text-3xl font-semibold text-fire">🔥 {{ creation.fireCount }} 把柴</p>
-          <button v-if="canReact" type="button" class="btn-primary mt-5" :disabled="fireLoading" @click="handleFire">{{ fireLoading ? '添柴中…' : '添一把柴 🔥' }}</button>
-          <p v-if="message" class="mt-4 text-sm leading-6 text-charcoal" role="status">{{ message }}</p>
+          <p class="mt-5 rounded-2xl bg-fire/10 px-4 py-3 text-sm leading-6 text-charcoal">旧版互动数据已归档，本页面仅供历史查看。</p>
 
           <dl class="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-ink/10 bg-ink/10">
             <div class="bg-[#fbf5ec] p-5"><dt class="text-xs tracking-[.15em] text-charcoal">出生于</dt><dd class="mt-2 font-semibold">贵州 · 贵阳 · 镇山村</dd></div>
@@ -138,18 +75,7 @@ onBeforeUnmount(() => { if (afterPreview.value) URL.revokeObjectURL(afterPreview
           </figure>
         </div>
 
-        <div v-if="canUploadAfter" class="paper-card mt-8 p-5 sm:p-7">
-          <h3 class="font-serif text-2xl font-semibold">补上出炉后的照片</h3>
-          <p class="mt-2 text-sm leading-6 text-charcoal">这台浏览器保存着作品凭证，可以上传或更换出炉照片。</p>
-          <div class="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center">
-            <label class="btn-secondary cursor-pointer"><input type="file" accept="image/jpeg,image/png,image/webp,image/*" capture="environment" class="sr-only" @change="chooseAfterImage" />选择出炉照片</label>
-            <span v-if="afterFile" class="truncate text-sm text-charcoal">{{ afterFile.name }}</span>
-            <button v-if="afterFile" type="button" class="btn-primary sm:ml-auto" :disabled="uploadLoading" @click="submitAfterImage">{{ uploadLoading ? '保存中…' : '保存到面包档案' }}</button>
-          </div>
-          <img v-if="afterPreview" :src="afterPreview" alt="准备上传的出炉照片预览" class="mt-5 max-h-80 w-full rounded-2xl object-cover" />
-          <p v-if="uploadError" class="mt-4 text-sm text-fire" role="alert">{{ uploadError }}</p>
-        </div>
-        <p v-else-if="creation.batch.status === 'ready' && !creation.afterImage" class="mt-6 rounded-2xl bg-white/50 p-4 text-sm leading-6 text-charcoal">出炉照片只能由最初提交作品的浏览器上传；凭证丢失时可请店员在后台代为补图。</p>
+        <p v-if="!creation.afterImage" class="mt-6 rounded-2xl bg-white/50 p-4 text-sm leading-6 text-charcoal">这是旧版今日同炉的只读历史档案，不再接受照片补传。</p>
       </div>
     </section>
   </div>

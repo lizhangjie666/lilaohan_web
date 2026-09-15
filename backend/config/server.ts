@@ -5,6 +5,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Server =>
   port: env.int('PORT', 1337),
   url: env('PUBLIC_URL', ''),
   proxy: env.bool('IS_PROXIED', false),
+  cron: { enabled: true },
   app: {
     keys: env.array('APP_KEYS')!,
   },

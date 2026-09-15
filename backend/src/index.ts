@@ -9,6 +9,8 @@ import {
 } from './admin-localization';
 import { ensureDefaultPageSections } from './page-section-defaults';
 import { ensureDefaultDiyContent } from './diy-defaults';
+import { registerOvenOrderAdmin } from './oven-order-admin';
+import { assertOvenPhoneEncryptionConfigured, ensureOvenOrderCounter, purgeExpiredOvenPhones, syncOverdueOvenOrders } from './oven-orders';
 
 export default {
   /**
@@ -19,6 +21,7 @@ export default {
    */
   register({ strapi }: { strapi: Core.Strapi }) {
     registerChineseAdminDefaults(strapi);
+    registerOvenOrderAdmin(strapi);
   },
 
   /**
@@ -29,6 +32,18 @@ export default {
    * run jobs, or perform some special logic.
    */
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    assertOvenPhoneEncryptionConfigured();
+    await ensureOvenOrderCounter(strapi);
+    strapi.cron.add({
+      ovenOrderReadySync: {
+        task: async () => { await syncOverdueOvenOrders(strapi); },
+        options: '0 * * * * *',
+      },
+      ovenOrderPhonePurge: {
+        task: async () => { await purgeExpiredOvenPhones(strapi); },
+        options: '0 15 3 * * *',
+      },
+    });
     await ensureDefaultPageSections(strapi);
     await ensureDefaultDiyContent(strapi);
     await localizeAdminContent(strapi);

@@ -1,6 +1,8 @@
 import type { StrapiApp } from '@strapi/strapi/admin';
+import { Clock } from '@strapi/icons';
 
 const zhHansTranslations: Record<string, string> = {
+  'oven-orders.menu': '出炉进度',
   'app.components.LeftMenu.navbrand.title': '李老汉内容后台',
   'HomePage.header.title': '你好，{name}',
   'HomePage.header.subtitle': '管理门店产品、手作教程、打卡指南和营业信息。',
@@ -142,6 +144,16 @@ export default {
     translations: {
       'zh-Hans': zhHansTranslations,
     },
+  },
+  register(app: StrapiApp) {
+    app.addMenuLink({
+      to: '/oven-orders',
+      icon: Clock,
+      intlLabel: { id: 'oven-orders.menu', defaultMessage: '出炉进度' },
+      Component: () => import('./pages/OvenOrders'),
+      permissions: [],
+      position: 1,
+    });
   },
   bootstrap(_app: StrapiApp) {
     const currentLanguage = window.localStorage.getItem('strapi-admin-language');
