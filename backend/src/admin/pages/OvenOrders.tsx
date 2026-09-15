@@ -23,6 +23,8 @@ const statusText: Record<Status, string> = {
   cancelled: '已取消',
 };
 
+const ordersEndpoint = '/admin/oven-orders';
+
 const styles: Record<string, React.CSSProperties> = {
   page: { minHeight: '100%', background: '#f6f6f9', padding: '32px' },
   wrap: { maxWidth: 1280, margin: '0 auto' },
@@ -45,7 +47,11 @@ const styles: Record<string, React.CSSProperties> = {
 };
 
 function apiError(error: any) {
-  return String(error?.response?.data?.error?.message || error?.message || '操作失败，请稍后重试。');
+  const message = String(error?.response?.data?.error?.message || error?.message || '操作失败，请稍后重试。');
+  if (/Unexpected token|valid JSON|Method Not Allowed/i.test(message)) {
+    return '后台接口暂时不可用，请刷新页面后重试。';
+  }
+  return message;
 }
 
 function imageUrl(media: Media) {
@@ -81,7 +87,7 @@ function OrderCard({ order, now, onUpdate }: { order: Order; now: number; onUpda
   async function update(payload: Record<string, unknown>) {
     setBusy(true); setMessage('');
     try {
-      const response = await put(`/oven-orders/${order.documentId}`, payload);
+      const response = await put(`${ordersEndpoint}/${order.documentId}`, payload);
       onUpdate(response.data.data);
     } catch (error) { setMessage(apiError(error)); }
     finally { setBusy(false); }
@@ -94,7 +100,7 @@ function OrderCard({ order, now, onUpdate }: { order: Order; now: number; onUpda
     if (before) body.append('beforeImage', before);
     if (after) body.append('afterImage', after);
     try {
-      const response = await post(`/oven-orders/${order.documentId}/images`, body);
+      const response = await post(`${ordersEndpoint}/${order.documentId}/images`, body);
       onUpdate(response.data.data); setBefore(null); setAfter(null); setMessage('照片已保存。');
     } catch (error) { setMessage(apiError(error)); }
     finally { setBusy(false); }
@@ -163,7 +169,7 @@ export default function OvenOrders() {
 
   const load = React.useCallback(async () => {
     try {
-      const response = await get('/oven-orders');
+      const response = await get(ordersEndpoint);
       setOrders(response.data.data);
       if (response.data.data[0]?.serverTime) {
         serverOffset.current = new Date(response.data.data[0].serverTime).getTime() - Date.now();
@@ -185,7 +191,7 @@ export default function OvenOrders() {
     const body = new FormData(); body.append('customerName', name); body.append('phone', phone);
     if (before) body.append('beforeImage', before);
     try {
-      const response = await post('/oven-orders', body);
+      const response = await post(ordersEndpoint, body);
       calibrate(response.data.data);
       setOrders(current => [response.data.data, ...current]); setName(''); setPhone(''); setBefore(null);
     } catch (requestError) { setError(apiError(requestError)); }
