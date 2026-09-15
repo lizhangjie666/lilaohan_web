@@ -11,15 +11,14 @@ const blocks = computed(() => mergePageSections(sectionList.value, ['visit.hero'
 const config = useRuntimeConfig()
 const phone = computed(() => String(config.public.phone || site.value?.phone || ''))
 const wechat = computed(() => String(config.public.wechat || site.value?.wechat || ''))
-const amap = computed(() => String(config.public.amapUrl || site.value?.amapUrl || ''))
 const xiaohongshuGuideUrl = computed(() => String(site.value?.xiaohongshuGuideUrl || ''))
-useSeoMeta({ title: '到店指南', description: '查看李老汉窑烤面包的地址、营业时间、停车提示、地图导航与咨询方式。' })
+useSeoMeta({ title: '到店指南', description: '查看李老汉窑烤面包的地址、营业时间、停车提示、到店指引与咨询方式。' })
 </script>
 
 <template>
   <div>
     <PageHero :eyebrow="blocks.hero.eyebrow" :title="blocks.hero.title" :description="blocks.hero.description" :image="blocks.hero.image" :image-alt="blocks.hero.imageAlt">
-      <div class="flex flex-wrap gap-3"><a v-if="amap" :href="amap" class="btn-primary" target="_blank" rel="noopener">{{ blocks.hero.primaryButtonText }}</a><span v-else class="btn-primary cursor-not-allowed opacity-70">导航链接待确认</span><a v-if="phone" :href="`tel:${phone}`" class="btn-secondary">{{ blocks.hero.secondaryButtonText }}</a></div>
+      <div class="flex flex-wrap gap-3"><a v-if="xiaohongshuGuideUrl" :href="xiaohongshuGuideUrl" class="btn-primary" target="_blank" rel="noopener noreferrer">到店指引</a><span v-else class="btn-primary cursor-not-allowed opacity-70">到店指引待发布</span><a v-if="phone" :href="`tel:${phone}`" class="btn-secondary">{{ blocks.hero.secondaryButtonText }}</a></div>
     </PageHero>
     <section class="page-wrap grid gap-8 py-16 md:grid-cols-2 md:py-24">
       <article class="paper-card p-7 md:p-10"><p class="eyebrow">{{ blocks.info.eyebrow }}</p><h2 class="mt-4 font-serif text-3xl font-semibold">{{ blocks.info.title }}</h2><p v-if="blocks.info.description" class="mt-4 leading-7 text-charcoal">{{ blocks.info.description }}</p><ContentImage v-if="blocks.info.image" :image="blocks.info.image" :alt="blocks.info.imageAlt" sizes="(min-width: 768px) 50vw, 100vw" class="mt-6 aspect-[16/9] w-full rounded-2xl object-cover" /><dl class="mt-7 grid gap-6"><div><dt class="text-sm font-semibold">地址</dt><dd class="mt-2 leading-7 text-charcoal">{{ site?.address }}</dd></div><div><dt class="text-sm font-semibold">营业时间</dt><dd class="mt-2 leading-7 text-charcoal">{{ site?.hours }}</dd></div><div><dt class="text-sm font-semibold">停车与进村</dt><dd class="mt-2 leading-7 text-charcoal">{{ site?.parking }}</dd><a v-if="xiaohongshuGuideUrl" :href="xiaohongshuGuideUrl" class="mt-3 inline-flex items-center gap-2 rounded-full border border-fire/30 bg-fire/5 px-4 py-2 text-sm font-semibold text-fire transition hover:border-fire hover:bg-fire hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fire" target="_blank" rel="noopener noreferrer"><span>查看小红书到店指引</span><span aria-hidden="true">↗</span></a></div><div><dt class="text-sm font-semibold">当前公告</dt><dd class="mt-2 leading-7 text-fire">{{ site?.notice }}</dd></div></dl></article>
