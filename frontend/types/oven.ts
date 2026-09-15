@@ -4,7 +4,6 @@ export type OvenBatchStatus = 'preparing' | 'baking' | 'ready' | 'finished'
 export type OvenOrderStatus = 'processing' | 'ready' | 'collected' | 'cancelled'
 
 export interface OvenOrderPublic {
-  serialNumber: string
   customerName: string
   startedAt: string
   estimatedReadyAt: string

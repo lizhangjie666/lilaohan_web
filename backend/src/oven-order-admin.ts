@@ -39,6 +39,11 @@ export function registerOvenOrderAdmin(strapi: any) {
       const phone = normalizePhone(ctx.request.body?.phone);
       if (!customerName) return reject(ctx, 400, '请填写顾客姓名。');
       if (!phone) return reject(ctx, 400, '请填写有效的联系电话。');
+      const last4 = phoneLast4(phone);
+      const sameTail = await strapi.db.query(OVEN_ORDER_UID).findOne({
+        where: { phoneLast4: last4, status: { $in: ['processing', 'ready'] } },
+      });
+      if (sameTail) return reject(ctx, 409, '该手机尾号已有进行中的面包，请先标记为已领取或已取消。');
 
       const beforeFile = uploadedFile(ctx, 'beforeImage');
       const imageError = await validateOvenImage(beforeFile);
@@ -56,7 +61,7 @@ export function registerOvenOrderAdmin(strapi: any) {
             customerName,
             phoneEncrypted: encryptPhone(strapi, phone),
             phoneHash: phoneDigest(strapi, phone),
-            phoneLast4: phoneLast4(phone),
+            phoneLast4: last4,
             startedAt,
             estimatedReadyAt,
             status: 'processing',

@@ -13,7 +13,6 @@ import {
   decryptPhone,
   effectiveOrderStatus,
   encryptPhone,
-  formatOrderSerial,
   normalizeCustomerName,
   normalizePhone,
   phoneDigest,
@@ -44,13 +43,11 @@ test('顾客输入会清理多余空白并按长度截断', () => {
   assert.equal(cleanOvenText(undefined, 20), '');
 });
 
-test('出炉进度登记会规范姓名、电话和连续序号展示', () => {
+test('出炉进度登记会规范姓名和电话尾号', () => {
   assert.equal(normalizeCustomerName('  李阿姨\n  '), '李阿姨');
   assert.equal(normalizePhone('138-0000-5678'), '13800005678');
   assert.equal(normalizePhone('123'), '');
   assert.equal(phoneLast4('13800005678'), '5678');
-  assert.equal(formatOrderSerial(1), '0001');
-  assert.equal(formatOrderSerial(10235), '10235');
 });
 
 test('90分钟结束后仅把制作中记录视为可以取啦', () => {

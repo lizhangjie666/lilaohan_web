@@ -92,11 +92,11 @@ export function useOven() {
   return {
     visitorId,
 
-    async lookupOrder(serialNumber: string, phoneLast4: string) {
+    async lookupOrder(phoneLast4: string) {
       try {
         const result = await request<{ data: any }>('/orders/lookup', {
           method: 'POST',
-          body: { serialNumber, phoneLast4 },
+          body: { phoneLast4 },
         })
         return normalizeOrder(result.data)
       } catch (error) {

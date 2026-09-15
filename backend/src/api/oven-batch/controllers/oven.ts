@@ -83,11 +83,11 @@ export default {
   },
 
   async create(ctx: any) {
-    return reject(ctx, 410, '今日同炉已升级为店员登记，请使用序号查询面包进度。');
+    return reject(ctx, 410, '今日同炉已升级为店员登记，请使用手机尾号查询面包进度。');
   },
 
   async fire(ctx: any) {
-    return reject(ctx, 410, '添柴互动已经结束，请使用序号查询面包进度。');
+    return reject(ctx, 410, '添柴互动已经结束，请使用手机尾号查询面包进度。');
   },
 
   async afterImage(ctx: any) {

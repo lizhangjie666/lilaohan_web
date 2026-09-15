@@ -37,7 +37,7 @@ onBeforeUnmount(() => { if (timer) clearInterval(timer) })
   <div class="rounded-[1.75rem] border border-ink/10 bg-white p-5 shadow-sm sm:p-7" aria-live="polite">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div>
-        <p class="text-xs font-bold tracking-[.18em] text-fire">序号 #{{ order.serialNumber }}</p>
+        <p class="text-xs font-bold tracking-[.18em] text-fire">MY BREAD · 我的面包</p>
         <h2 class="mt-2 font-serif text-3xl font-semibold">{{ order.customerName }}的面包</h2>
       </div>
       <span class="rounded-full px-4 py-2 text-sm font-bold" :class="status === 'ready' ? 'bg-[#ddefd8] text-[#276238]' : status === 'processing' ? 'bg-fire/10 text-fire' : 'bg-ink/10 text-charcoal'">

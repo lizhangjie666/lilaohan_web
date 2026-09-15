@@ -5,7 +5,6 @@ type Status = 'processing' | 'ready' | 'collected' | 'cancelled';
 type Media = { url: string } | null;
 type Order = {
   documentId: string;
-  serialNumber: string;
   customerName: string;
   phone: string | null;
   phoneMasked: string;
@@ -105,7 +104,7 @@ function OrderCard({ order, now, onUpdate }: { order: Order; now: number; onUpda
   return <article style={styles.card}>
     <div style={{ ...styles.row, justifyContent: 'space-between' }}>
       <div style={styles.row}>
-        <strong style={{ fontSize: 22, color: '#32324d' }}>#{order.serialNumber} · {order.customerName}</strong>
+        <strong style={{ fontSize: 22, color: '#32324d' }}>{order.customerName}</strong>
         <span style={styles.badge}>{statusText[order.status]}</span>
       </div>
       <button style={styles.secondary} type="button" onClick={() => setShowPhone(value => !value)}>
@@ -201,7 +200,7 @@ export default function OvenOrders() {
   return <main style={styles.page}>
     <div style={styles.wrap}>
       <h1 style={styles.heading}>出炉进度</h1>
-      <p style={styles.intro}>登记顾客后立即开始90分钟倒计时。序号由系统自动生成，顾客可使用序号和手机后四位查询。</p>
+      <p style={styles.intro}>登记顾客后立即开始90分钟倒计时。顾客使用手机后四位查询；进行中的记录不能使用相同尾号，避免查错他人的面包。</p>
       <section style={styles.panel}>
         <h2 style={{ marginTop: 0, color: '#32324d' }}>登记新的面包</h2>
         <form style={styles.form} onSubmit={create}>

@@ -76,11 +76,6 @@ export function maskPhone(phone: string, last4 = ''): string {
   return last4 ? `****${last4}` : '号码已清除';
 }
 
-export function formatOrderSerial(value: unknown): string {
-  const numeric = Math.max(0, Number(value) || 0);
-  return String(numeric).padStart(4, '0');
-}
-
 export function effectiveOrderStatus(order: any, now = Date.now()) {
   if (order.status === 'processing' && new Date(order.estimatedReadyAt).getTime() <= now) return 'ready';
   return order.status;
@@ -100,7 +95,6 @@ export function mediaDto(media: any) {
 
 export function publicOrderDto(order: any, now = Date.now()) {
   return {
-    serialNumber: formatOrderSerial(order.serialNumber),
     customerName: order.customerName,
     startedAt: order.startedAt,
     estimatedReadyAt: order.estimatedReadyAt,
