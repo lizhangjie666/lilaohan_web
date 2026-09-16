@@ -78,11 +78,16 @@ function mediaAsset(value: any, base = '', fallbackAlt = ''): ImageAsset | undef
   if (!originalUrl) return undefined
 
   const formats = media.formats && typeof media.formats === 'object' ? media.formats : {}
-  const variants = ['small', 'medium', 'large']
+  const optimizedVariants = ['webSmall', 'webMedium']
     .map(key => formats[key])
     .filter(format => format && typeof format.url === 'string' && Number(format.width) > 0)
     .sort((a, b) => Number(a.width) - Number(b.width))
-  const preferred = formats.large || formats.medium || formats.small || media
+  const fallbackVariants = ['thumbnail', 'small', 'medium', 'large']
+    .map(key => formats[key])
+    .filter(format => format && typeof format.url === 'string' && Number(format.width) > 0)
+    .sort((a, b) => Number(a.width) - Number(b.width))
+  const variants = optimizedVariants.length ? optimizedVariants : fallbackVariants
+  const preferred = formats.webMedium || formats.webSmall || formats.large || formats.medium || formats.small || media
   const preferredUrl = absoluteMediaUrl(preferred.url, base) || originalUrl
 
   return {

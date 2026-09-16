@@ -12,6 +12,7 @@ import { ensureDefaultDiyContent } from './diy-defaults';
 import { ensureConfirmedSiteContact } from './site-setting-defaults';
 import { registerOvenOrderAdmin } from './oven-order-admin';
 import { assertOvenPhoneEncryptionConfigured, ensureOvenOrderCounter, purgeExpiredOvenPhones, syncOverdueOvenOrders } from './oven-orders';
+import { optimizeExistingUploads, registerUploadOptimization } from './upload-optimizer';
 
 export default {
   /**
@@ -34,6 +35,7 @@ export default {
    */
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     assertOvenPhoneEncryptionConfigured();
+    registerUploadOptimization(strapi);
     await ensureOvenOrderCounter(strapi);
     strapi.cron.add({
       ovenOrderReadySync: {
@@ -48,6 +50,7 @@ export default {
     await ensureDefaultPageSections(strapi);
     await ensureDefaultDiyContent(strapi);
     await ensureConfirmedSiteContact(strapi);
+    await optimizeExistingUploads(strapi);
     await localizeAdminContent(strapi);
     await configureChineseEditorRole(strapi);
     await configurePublicReadPermissions(strapi);
