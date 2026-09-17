@@ -50,12 +50,12 @@ useSeoMeta({
         <OvenOrderProgress :order="order" />
         <div class="grid gap-5 sm:grid-cols-2">
           <figure class="paper-card overflow-hidden">
-            <ContentImage v-if="order.beforeImage" :image="order.beforeImage" :alt="`${order.customerName}的面包入炉前照片`" sizes="(min-width:640px) 50vw, 100vw" class="aspect-[4/3] w-full object-cover" />
+            <ZoomableContentImage v-if="order.beforeImage" :image="order.beforeImage" :alt="`${order.customerName}的面包入炉前照片`" sizes="(min-width:640px) 50vw, 100vw" image-class="aspect-[4/3] w-full object-contain" />
             <div v-else class="grid aspect-[4/3] place-items-center bg-[#ead8bd] px-6 text-center text-charcoal"><p><span class="block text-4xl">🥖</span><b class="mt-3 block">店员稍后补充照片</b></p></div>
             <figcaption class="p-5 font-serif text-xl font-semibold">入炉前</figcaption>
           </figure>
           <figure class="paper-card overflow-hidden">
-            <ContentImage v-if="order.afterImage" :image="order.afterImage" :alt="`${order.customerName}的面包出炉后照片`" sizes="(min-width:640px) 50vw, 100vw" class="aspect-[4/3] w-full object-cover" />
+            <ZoomableContentImage v-if="order.afterImage" :image="order.afterImage" :alt="`${order.customerName}的面包出炉后照片`" sizes="(min-width:640px) 50vw, 100vw" image-class="aspect-[4/3] w-full object-contain" />
             <div v-else class="grid aspect-[4/3] place-items-center bg-[#d9c29f] px-6 text-center text-charcoal"><p><span class="block text-4xl">🔥</span><b class="mt-3 block">等待出炉后的模样</b></p></div>
             <figcaption class="p-5 font-serif text-xl font-semibold">出炉后</figcaption>
           </figure>

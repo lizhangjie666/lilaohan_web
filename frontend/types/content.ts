@@ -1,5 +1,6 @@
 export interface ImageAsset {
   src: string
+  original?: string
   srcset?: string
   width?: number
   height?: number

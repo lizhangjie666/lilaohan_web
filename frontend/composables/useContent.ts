@@ -92,6 +92,7 @@ function mediaAsset(value: any, base = '', fallbackAlt = ''): ImageAsset | undef
 
   return {
     src: preferredUrl,
+    original: originalUrl,
     srcset: variants.length
       ? variants.map(format => `${absoluteMediaUrl(format.url, base)} ${Number(format.width)}w`).join(', ')
       : undefined,

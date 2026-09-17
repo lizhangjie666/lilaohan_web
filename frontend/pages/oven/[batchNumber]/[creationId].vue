@@ -65,11 +65,11 @@ useSeoMeta({
         </div>
         <div class="grid gap-5 md:grid-cols-2">
           <figure class="paper-card overflow-hidden">
-            <ContentImage v-if="creation.beforeImage" :image="creation.beforeImage" :alt="`${creation.breadName}入窑前`" sizes="(min-width: 768px) 50vw, 100vw" class="aspect-[4/3] w-full object-cover" />
+            <ZoomableContentImage v-if="creation.beforeImage" :image="creation.beforeImage" :alt="`${creation.breadName}入窑前`" sizes="(min-width: 768px) 50vw, 100vw" image-class="aspect-[4/3] w-full object-contain" />
             <figcaption class="p-5 font-serif text-xl font-semibold">入窑前</figcaption>
           </figure>
           <figure class="paper-card overflow-hidden">
-            <ContentImage v-if="creation.afterImage" :image="creation.afterImage" :alt="`${creation.breadName}出炉后`" sizes="(min-width: 768px) 50vw, 100vw" class="aspect-[4/3] w-full object-cover" />
+            <ZoomableContentImage v-if="creation.afterImage" :image="creation.afterImage" :alt="`${creation.breadName}出炉后`" sizes="(min-width: 768px) 50vw, 100vw" image-class="aspect-[4/3] w-full object-contain" />
             <div v-else class="grid aspect-[4/3] place-items-center bg-[#d6bd94] px-6 text-center text-charcoal"><p><span class="block text-4xl" aria-hidden="true">🔥</span><b class="mt-3 block font-serif text-2xl">还在等出炉后的模样</b></p></div>
             <figcaption class="p-5 font-serif text-xl font-semibold">出炉后</figcaption>
           </figure>
