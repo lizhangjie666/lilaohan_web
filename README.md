@@ -52,6 +52,7 @@
 - 主页微信访问二维码下载页为 `/qr/home`，二维码文件为 `/images/homepage-qr-ip-v1.png` 和 `/images/homepage-qr-ip-v1.svg`。当前文件只用于 `http://122.51.118.103/` 的 IP 验收。
 - 面包进度查询二维码下载页为 `/qr/oven`，二维码指向 `/oven/today`；高清文件为 `/images/oven-progress-qr-ip-v1.png` 和 `/images/oven-progress-qr-ip-v1.svg`。
 - 重新生成二维码时，在 `frontend` 运行 `npm run generate:homepage-qr`；可通过 `HOMEPAGE_QR_URL` 与 `HOMEPAGE_QR_VERSION` 指定新地址和新版本。绑定备案域名并启用 HTTPS 后必须使用新版本文件名，避免一年期图片缓存和已印刷旧地址混淆。
+- 面包造型篇扫码海报位于 `frontend/public/images/bread-shaping-poster-ip-v1.png`（另有 SVG）；独立二维码为 `bread-shaping-qr-ip-v1.png` 和 SVG，目标是 `/diy/bread-diy/tutorial#shaping`。在 `frontend` 运行 `npm run generate:shaping-qr -- "参考照片路径"` 可重新生成；更换正式域名时同时设置 `SHAPING_QR_URL` 和 `SHAPING_QR_VERSION`，避免覆盖已印刷版本。
 
 - 复制 `deploy/.env.example` 为 `deploy/.env`，填写域名、数据库密码和随机密钥。
 - 为出炉进度中的完整电话设置 `OVEN_PHONE_ENCRYPTION_KEY`，必须使用至少 32 位的独立高强度随机值且不得提交。旧版历史数据仍可能读取 `OVEN_OWNER_TOKEN_SECRET`、`OVEN_ANONYMOUS_ID_SALT`，新流程不再使用它们进行投稿或添柴。

@@ -175,6 +175,7 @@ Sites 项目标识保存在 `frontend/.openai/hosting.json`，必须复用现有
 
 - 主页微信访问二维码下载页为 `/qr/home`，提供高清 PNG 与印刷 SVG；当前 `ip-v1` 版本只指向 `http://122.51.118.103/`。二维码不放入主页，也不包含账号、个人信息或跟踪参数。
 - 面包出炉进度二维码下载页为 `/qr/oven`，扫码进入 `http://122.51.118.103/oven/today`，顾客再用登记手机号后四位私密查询进度；二维码本身不包含手机号或顾客数据。
+- 面包造型篇参考门店实拍制作了 `bread-shaping-poster-ip-v1` 海报（PNG/SVG）和 `bread-shaping-qr-ip-v1` 独立二维码（PNG/SVG），目标地址为 `http://122.51.118.103/diy/bread-diy/tutorial#shaping`。原图保留在店主照片目录，生成脚本为 `frontend/scripts/generate-shaping-qr.mjs`；未来换域名需更新 URL 与版本后重新印刷。
 - 二维码资源使用版本化文件名。未来绑定备案域名并启用 HTTPS 后，需要生成新版本二维码并重新制作长期印刷物，不能继续沿用 IP 验收版。
 
 - 2026-09-10 已部署到腾讯云 Ubuntu 24.04，IP 验收地址为 `http://122.51.118.103`
