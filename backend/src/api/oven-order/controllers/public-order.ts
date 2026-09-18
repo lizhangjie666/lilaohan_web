@@ -1,4 +1,4 @@
-import { findOvenOrder, OVEN_ORDER_UID, publicOrderDto, syncOverdueOvenOrders } from '../../../oven-orders';
+import { findOvenOrder, OVEN_ORDER_UID, ovenOrderRetentionCutoff, publicOrderDto, purgeExpiredOvenOrders, syncOverdueOvenOrders } from '../../../oven-orders';
 
 type Attempt = { count: number; resetAt: number };
 const attempts = new Map<string, Attempt>();
@@ -38,9 +38,10 @@ export default {
       return reject(ctx, 404, GENERIC_LOOKUP_ERROR);
     }
 
+    await purgeExpiredOvenOrders(strapi);
     await syncOverdueOvenOrders(strapi);
     const matches = await strapi.db.query(OVEN_ORDER_UID).findMany({
-      where: { phoneLast4: last4, status: { $in: ['processing', 'ready'] } },
+      where: { phoneLast4: last4, status: { $in: ['processing', 'ready'] }, startedAt: { $gte: ovenOrderRetentionCutoff() } },
       orderBy: { createdAt: 'desc' },
       limit: 2,
     });

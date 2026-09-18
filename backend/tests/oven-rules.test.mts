@@ -15,6 +15,8 @@ import {
   encryptPhone,
   normalizeCustomerName,
   normalizePhone,
+  ovenOrderIsRetained,
+  ovenOrderRetentionCutoff,
   phoneDigest,
   phoneLast4,
 } from '../src/oven-orders.ts';
@@ -24,6 +26,18 @@ test('炉号按三位展示，并在已有炉次后自动递增', () => {
   assert.equal(nextOvenBatchNumber(86, undefined), 87);
   assert.equal(nextOvenBatchNumber(undefined, 86), 86);
   assert.equal(nextOvenBatchNumber(undefined, undefined), null);
+});
+
+test('北京时间跨天后保留昨夜订单至06:00，之后清理且重复计算稳定', () => {
+  const late = '2026-09-17T15:30:00.000Z'; // 北京时间23:30
+  const before = new Date('2026-09-17T21:59:00.000Z'); // 次日05:59
+  const after = new Date('2026-09-17T22:00:00.000Z'); // 次日06:00
+  assert.equal(ovenOrderRetentionCutoff(before).toISOString(), '2026-09-16T16:00:00.000Z');
+  assert.equal(ovenOrderRetentionCutoff(after).toISOString(), '2026-09-17T16:00:00.000Z');
+  assert.equal(ovenOrderIsRetained(late, before), true);
+  assert.equal(ovenOrderIsRetained(late, after), false);
+  assert.equal(ovenOrderIsRetained('2026-09-17T16:30:00.000Z', after), true);
+  assert.equal(ovenOrderRetentionCutoff(after).toISOString(), ovenOrderRetentionCutoff(after).toISOString());
 });
 
 test('炉次状态严格控制投稿、添柴和出炉照', () => {

@@ -2,6 +2,7 @@ import {
   adminOrderDto,
   allocateOvenOrderSerial,
   DEFAULT_OVEN_MINUTES,
+  deleteOvenOrder,
   encryptPhone,
   findOvenOrder,
   listOvenOrders,
@@ -9,6 +10,8 @@ import {
   normalizePhone,
   OVEN_ORDER_STATUSES,
   OVEN_ORDER_UID,
+  ovenOrderRetentionCutoff,
+  purgeExpiredOvenOrders,
   phoneDigest,
   phoneLast4,
   syncOverdueOvenOrders,
@@ -35,13 +38,14 @@ export function registerOvenOrderAdmin(strapi: any) {
     },
 
     async create(ctx: any) {
+      await purgeExpiredOvenOrders(strapi);
       const customerName = normalizeCustomerName(ctx.request.body?.customerName);
       const phone = normalizePhone(ctx.request.body?.phone);
       if (!customerName) return reject(ctx, 400, '请填写顾客姓名。');
       if (!phone) return reject(ctx, 400, '请填写有效的联系电话。');
       const last4 = phoneLast4(phone);
       const sameTail = await strapi.db.query(OVEN_ORDER_UID).findOne({
-        where: { phoneLast4: last4, status: { $in: ['processing', 'ready'] } },
+        where: { phoneLast4: last4, status: { $in: ['processing', 'ready'] }, startedAt: { $gte: ovenOrderRetentionCutoff() } },
       });
       if (sameTail) return reject(ctx, 409, '该手机尾号已有进行中的面包，请先标记为已领取或已取消。');
 
@@ -79,6 +83,7 @@ export function registerOvenOrderAdmin(strapi: any) {
     },
 
     async update(ctx: any) {
+      await purgeExpiredOvenOrders(strapi);
       const order = await findOvenOrder(strapi, String(ctx.params.documentId || ''));
       if (!order) return reject(ctx, 404, '没有找到这条进度记录。');
       const data: Record<string, any> = {};
@@ -111,6 +116,10 @@ export function registerOvenOrderAdmin(strapi: any) {
       if (ctx.request.body?.phone !== undefined) {
         const phone = normalizePhone(ctx.request.body.phone);
         if (!phone) return reject(ctx, 400, '请填写有效的联系电话。');
+        const conflict = await strapi.db.query(OVEN_ORDER_UID).findOne({
+          where: { phoneLast4: phoneLast4(phone), status: { $in: ['processing', 'ready'] }, startedAt: { $gte: ovenOrderRetentionCutoff() }, id: { $ne: order.id } },
+        });
+        if (conflict) return reject(ctx, 409, '该手机尾号已有进行中的面包。');
         data.phoneEncrypted = encryptPhone(strapi, phone);
         data.phoneHash = phoneDigest(strapi, phone);
         data.phoneLast4 = phoneLast4(phone);
@@ -127,6 +136,7 @@ export function registerOvenOrderAdmin(strapi: any) {
     },
 
     async images(ctx: any) {
+      await purgeExpiredOvenOrders(strapi);
       const order = await findOvenOrder(strapi, String(ctx.params.documentId || ''));
       if (!order) return reject(ctx, 404, '没有找到这条进度记录。');
       const beforeFile = uploadedFile(ctx, 'beforeImage');
@@ -162,6 +172,14 @@ export function registerOvenOrderAdmin(strapi: any) {
       const orders = await listOvenOrders(strapi);
       ctx.body = { data: orders.map((order: any) => adminOrderDto(strapi, order)) };
     },
+
+    async remove(ctx: any) {
+      await purgeExpiredOvenOrders(strapi);
+      const order = await findOvenOrder(strapi, String(ctx.params.documentId || ''));
+      if (!order) return reject(ctx, 404, '没有找到这条进度记录。');
+      await deleteOvenOrder(strapi, order);
+      ctx.body = { data: { deleted: true } };
+    },
   };
 
   strapi.get('controllers').set('admin::oven-orders', controller);
@@ -172,6 +190,7 @@ export function registerOvenOrderAdmin(strapi: any) {
       { method: 'GET', path: '/oven-orders', handler: 'oven-orders.list', config: { policies: ['admin::isAuthenticatedAdmin'] } },
       { method: 'POST', path: '/oven-orders', handler: 'oven-orders.create', config: { policies: ['admin::isAuthenticatedAdmin'] } },
       { method: 'PUT', path: '/oven-orders/:documentId', handler: 'oven-orders.update', config: { policies: ['admin::isAuthenticatedAdmin'] } },
+      { method: 'DELETE', path: '/oven-orders/:documentId', handler: 'oven-orders.remove', config: { policies: ['admin::isAuthenticatedAdmin'] } },
       { method: 'POST', path: '/oven-orders/:documentId/images', handler: 'oven-orders.images', config: { policies: ['admin::isAuthenticatedAdmin'] } },
       { method: 'POST', path: '/oven-orders/sync', handler: 'oven-orders.sync', config: { policies: ['admin::isAuthenticatedAdmin'] } },
     ],

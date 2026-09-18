@@ -5,6 +5,17 @@ export const OVEN_ORDER_UID = 'api::oven-order.oven-order';
 export const OVEN_COUNTER_UID = 'api::oven-order-counter.oven-order-counter';
 export const DEFAULT_OVEN_MINUTES = 90;
 export const OVEN_ORDER_STATUSES = ['processing', 'ready', 'collected', 'cancelled'] as const;
+const SHANGHAI_OFFSET_MS = 8 * 60 * 60 * 1000;
+
+export function ovenOrderRetentionCutoff(now = new Date()): Date {
+  const local = new Date(now.getTime() + SHANGHAI_OFFSET_MS);
+  const todayStart = Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate()) - SHANGHAI_OFFSET_MS;
+  return new Date(todayStart - (local.getUTCHours() < 6 ? 24 * 60 * 60 * 1000 : 0));
+}
+
+export function ovenOrderIsRetained(startedAt: string | Date, now = new Date()): boolean {
+  return new Date(startedAt).getTime() >= ovenOrderRetentionCutoff(now).getTime();
+}
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -174,6 +185,47 @@ export async function purgeExpiredOvenPhones(strapi: any, now = new Date()) {
   return orders.length;
 }
 
+async function removeUnreferencedOrderMedia(strapi: any, mediaIds: number[]) {
+  for (const id of new Set(mediaIds)) {
+    try {
+      const media = await query(strapi, 'plugin::upload.file').findOne({ where: { id }, populate: { related: true } });
+      if (media && (!media.related || media.related.length === 0)) {
+        await strapi.plugin('upload').service('upload').remove(media);
+      }
+    } catch {
+      strapi.log.error(`出炉进度照片清理失败，媒体 ID ${id}。`);
+    }
+  }
+}
+
+export async function deleteOvenOrder(strapi: any, order: any) {
+  const mediaIds = [order.beforeImage?.id, order.afterImage?.id].filter((id): id is number => Number.isInteger(id));
+  await query(strapi, OVEN_ORDER_UID).delete({ where: { id: order.id } });
+  await removeUnreferencedOrderMedia(strapi, mediaIds);
+}
+
+export async function purgeExpiredOvenOrders(strapi: any, now = new Date()) {
+  const cutoff = ovenOrderRetentionCutoff(now);
+  let removed = 0;
+  for (;;) {
+    const expired = await query(strapi, OVEN_ORDER_UID).findMany({
+      where: { startedAt: { $lt: cutoff } },
+      populate: { beforeImage: true, afterImage: true },
+      orderBy: { startedAt: 'asc' },
+      limit: 50,
+    });
+    if (!expired.length) break;
+    for (const order of expired) {
+      try { await deleteOvenOrder(strapi, order); removed += 1; }
+      catch {
+        strapi.log.error(`出炉进度记录清理失败，记录 ID ${order.id}。`);
+        return removed;
+      }
+    }
+  }
+  return removed;
+}
+
 export function uploadedFile(ctx: any, name: string) {
   const candidate = ctx.request.files?.[name];
   return Array.isArray(candidate) ? candidate[0] : candidate || null;
@@ -209,8 +261,10 @@ export async function findOvenOrder(strapi: any, documentId: string) {
 }
 
 export async function listOvenOrders(strapi: any) {
+  await purgeExpiredOvenOrders(strapi);
   await syncOverdueOvenOrders(strapi);
   return query(strapi, OVEN_ORDER_UID).findMany({
+    where: { startedAt: { $gte: ovenOrderRetentionCutoff() } },
     populate: { beforeImage: true, afterImage: true },
     orderBy: { createdAt: 'desc' },
     limit: 200,

@@ -109,13 +109,16 @@ function remaining(order: Order, now: number) {
   return minutes > 1 ? `约 ${minutes} 分钟` : '不到 1 分钟';
 }
 
-function OrderCard({ order, now, onUpdate }: { order: Order; now: number; onUpdate: (order: Order) => void }) {
-  const { put, post } = useFetchClient();
+function OrderCard({ order, now, onUpdate, onDelete }: { order: Order; now: number; onUpdate: (order: Order) => void; onDelete: (id: string) => void }) {
+  const { put, post, del } = useFetchClient();
   const [busy, setBusy] = React.useState(false);
   const [message, setMessage] = React.useState('');
   const [showPhone, setShowPhone] = React.useState(false);
   const [before, setBefore] = React.useState<File | null>(null);
   const [after, setAfter] = React.useState<File | null>(null);
+  const [editing, setEditing] = React.useState(false);
+  const [editName, setEditName] = React.useState(order.customerName);
+  const [editPhone, setEditPhone] = React.useState('');
 
   async function update(payload: Record<string, unknown>) {
     setBusy(true); setMessage('');
@@ -140,6 +143,23 @@ function OrderCard({ order, now, onUpdate }: { order: Order; now: number; onUpda
     finally { setBusy(false); }
   }
 
+  async function saveDetails(event: React.FormEvent) {
+    event.preventDefault();
+    setBusy(true); setMessage('');
+    try {
+      const response = await put(`${ordersEndpoint}/${order.documentId}`, { customerName: editName, ...(editPhone.trim() ? { phone: editPhone.trim() } : {}) });
+      onUpdate(response.data.data); setEditing(false); setEditPhone(''); setMessage('顾客信息已保存。');
+    } catch (error) { setMessage(apiError(error)); }
+    finally { setBusy(false); }
+  }
+
+  async function remove() {
+    if (!window.confirm(`确定删除“${order.customerName}”的进度和专用照片吗？删除后无法恢复。`)) return;
+    setBusy(true); setMessage('');
+    try { await del(`${ordersEndpoint}/${order.documentId}`); onDelete(order.documentId); }
+    catch (error) { setMessage(apiError(error)); setBusy(false); }
+  }
+
   const percent = progress(order, now);
   return <article style={styles.card}>
     <div style={{ ...styles.row, justifyContent: 'space-between' }}>
@@ -158,6 +178,15 @@ function OrderCard({ order, now, onUpdate }: { order: Order; now: number; onUpda
       <strong style={{ minWidth: 100, color: '#32324d' }}>{remaining(order, now)}</strong>
       <span style={styles.meta}>预计 {new Date(order.estimatedReadyAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</span>
     </div>
+    <div style={styles.row}>
+      <button style={styles.secondary} type="button" disabled={busy} onClick={() => { setEditing(value => !value); setEditName(order.customerName); setEditPhone(''); }}>编辑顾客信息</button>
+      <button style={{ ...styles.secondary, color: '#b42318' }} type="button" disabled={busy} onClick={remove}>删除记录</button>
+    </div>
+    {editing && <form style={styles.form} onSubmit={saveDetails}>
+      <label style={styles.label}>顾客姓名<input style={styles.input} value={editName} maxLength={30} required onChange={event => setEditName(event.target.value)} /></label>
+      <label style={styles.label}>更换联系电话（留空则不变）<input style={styles.input} type="tel" inputMode="tel" value={editPhone} onChange={event => setEditPhone(event.target.value)} /></label>
+      <button style={styles.primary} disabled={busy} type="submit">保存修改</button>
+    </form>}
     <div style={styles.row}>
       {order.status !== 'collected' && order.status !== 'cancelled' && <>
         <button style={styles.secondary} disabled={busy} onClick={() => update({ adjustMinutes: -10 })}>提前10分钟</button>
@@ -180,7 +209,7 @@ function OrderCard({ order, now, onUpdate }: { order: Order; now: number; onUpda
       </label>
     </div>
     {(before || after) && <button style={{ ...styles.primary, justifySelf: 'start' }} disabled={busy} onClick={upload}>{busy ? '保存中…' : '保存照片'}</button>}
-    {message && <p role="status" style={{ margin: 0, color: message === '照片已保存。' ? '#328048' : '#b42318' }}>{message}</p>}
+    {message && <p role="status" style={{ margin: 0, color: message.endsWith('已保存。') ? '#328048' : '#b42318' }}>{message}</p>}
   </article>;
 }
 
@@ -237,10 +266,15 @@ export default function OvenOrders() {
     setOrders(current => current.map(order => order.documentId === updated.documentId ? updated : order));
   }
 
+  const todayKey = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
+  const isToday = (order: Order) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(order.startedAt)) === todayKey;
+  const todayOrders = orders.filter(isToday);
+  const overnightOrders = orders.filter(order => !isToday(order));
+
   return <main style={styles.page}>
     <div style={styles.wrap}>
       <h1 style={styles.heading}>出炉进度</h1>
-      <p style={styles.intro}>登记顾客后立即开始90分钟倒计时。顾客使用手机后四位查询；进行中的记录不能使用相同尾号，避免查错他人的面包。</p>
+      <p style={styles.intro}>登记后立即开始90分钟倒计时。顾客用手机号后四位查询；昨日记录在次日北京时间06:00自动删除，专用照片一同清理。</p>
       <section style={styles.panel}>
         <h2 style={{ marginTop: 0, color: '#32324d' }}>登记新的面包</h2>
         <form style={styles.form} onSubmit={create}>
@@ -252,12 +286,17 @@ export default function OvenOrders() {
         {error && <p role="alert" style={{ color: '#b42318', marginBottom: 0 }}>{error}</p>}
       </section>
       <section style={styles.panel}>
-        <div style={{ ...styles.row, justifyContent: 'space-between' }}><h2 style={{ margin: 0, color: '#32324d' }}>顾客进度</h2><button style={styles.secondary} onClick={load}>刷新</button></div>
+        <div style={{ ...styles.row, justifyContent: 'space-between' }}><h2 style={{ margin: 0, color: '#32324d' }}>今日顾客进度</h2><button style={styles.secondary} onClick={load}>刷新</button></div>
         <div style={styles.grid}>
-          {orders.map(order => <OrderCard key={order.documentId} order={order} now={now} onUpdate={replace} />)}
-          {!orders.length && <p style={styles.intro}>暂时没有进度记录。</p>}
+          {todayOrders.map(order => <OrderCard key={order.documentId} order={order} now={now} onUpdate={replace} onDelete={id => setOrders(current => current.filter(item => item.documentId !== id))} />)}
+          {!todayOrders.length && <p style={styles.intro}>今天还没有进度记录。</p>}
         </div>
       </section>
+      {!!overnightOrders.length && <section style={styles.panel}>
+        <h2 style={{ marginTop: 0, color: '#32324d' }}>昨夜待交付</h2>
+        <p style={styles.intro}>这些记录会在北京时间06:00自动删除。</p>
+        <div style={styles.grid}>{overnightOrders.map(order => <OrderCard key={order.documentId} order={order} now={now} onUpdate={replace} onDelete={id => setOrders(current => current.filter(item => item.documentId !== id))} />)}</div>
+      </section>}
     </div>
   </main>;
 }

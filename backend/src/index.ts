@@ -11,7 +11,7 @@ import { ensureDefaultPageSections } from './page-section-defaults';
 import { ensureDefaultDiyContent } from './diy-defaults';
 import { ensureConfirmedSiteContact } from './site-setting-defaults';
 import { registerOvenOrderAdmin } from './oven-order-admin';
-import { assertOvenPhoneEncryptionConfigured, ensureOvenOrderCounter, purgeExpiredOvenPhones, syncOverdueOvenOrders } from './oven-orders';
+import { assertOvenPhoneEncryptionConfigured, ensureOvenOrderCounter, purgeExpiredOvenOrders, syncOverdueOvenOrders } from './oven-orders';
 import { optimizeExistingUploads, registerUploadOptimization } from './upload-optimizer';
 
 export default {
@@ -37,14 +37,15 @@ export default {
     assertOvenPhoneEncryptionConfigured();
     registerUploadOptimization(strapi);
     await ensureOvenOrderCounter(strapi);
+    await purgeExpiredOvenOrders(strapi);
     strapi.cron.add({
       ovenOrderReadySync: {
         task: async () => { await syncOverdueOvenOrders(strapi); },
         options: '0 * * * * *',
       },
-      ovenOrderPhonePurge: {
-        task: async () => { await purgeExpiredOvenPhones(strapi); },
-        options: '0 15 3 * * *',
+      ovenOrderDailyPurge: {
+        task: async () => { await purgeExpiredOvenOrders(strapi); },
+        options: '0 * * * * *',
       },
     });
     await ensureDefaultPageSections(strapi);
