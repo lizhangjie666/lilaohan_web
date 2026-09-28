@@ -14,10 +14,11 @@ const breadTutorialChapters = [
   },
   {
     anchor: 'tools', eyebrow: 'TOOLS & SAFETY', title: '工具使用篇',
-    summary: '认识擀面杖和切面刀，先学会安全、轻柔地使用工具，再开始塑造面团。',
+    summary: '认识擀面杖、切面刀和面粉的正确用法，先学会安全、轻柔地使用工具，再开始塑造面团。',
     lessons: [
       { title: '擀面杖', description: '用于把面团擀开、控制厚薄和整理形状。不要一开始就用力压薄，以免排出过多气体或让厚薄失控。', steps: [{ value: '面团轻轻拍扁' }, { value: '从中间向外短距离擀压' }, { value: '转动面团检查厚薄' }, { value: '达到造型需要后停止' }], safetyNote: '操作时给手指留出空间，儿童应在成人指导下使用。' },
       { title: '切面刀 / 面团刮板', description: '用于分割面团、托起柔软面团和清理台面。它更适合向下利落分割，不要像锯子一样来回拉扯。', steps: [{ value: '握稳手柄' }, { value: '确认另一只手离开切线' }, { value: '刀口垂直向下一次分割' }, { value: '用宽面托起或移动面团' }], safetyNote: '放下时刀口朝下并远离桌边；儿童使用切面刀必须由成人全程指导。' },
+      { title: '面粉', description: '做面包造型时，可以在手上、桌面或擀面杖上薄薄撒一点面粉。它能防粘手、防粘桌面，也能减少面团因粘连拉扯而变形，帮助保持造型。', steps: [{ value: '在手上薄薄撒一点，方便拿取和整理面团' }, { value: '在桌面薄薄撒一点，让擀压、搓条和切造型更顺手' }, { value: '需要时给擀面杖轻撒一点，避免擀压时粘连' }], safetyNote: '面粉只需要薄薄撒一点。用得太多会让面团表面变干，花环、辫子和小动物等造型的接口可能粘不牢。\n记住：面粉是用来防粘的，不是越多越好。' },
     ],
   },
   {
@@ -358,5 +359,49 @@ export async function ensureDefaultDiyContent(strapi: Core.Strapi) {
       });
     }
     await migrationStore.set({ key: 'diy-promotion-migration-version', value: 9 });
+  }
+
+  if (version < 10) {
+    const publishedBread = await tutorialDocuments.findFirst({
+      filters: { slug: 'bread-diy' },
+      status: 'published',
+      populate: {
+        tutorialChapters: {
+          populate: {
+            image: true,
+            lessons: { populate: { image: true, steps: true } },
+          },
+        },
+      },
+    } as any) as any;
+    const chapters = publishedBread?.tutorialChapters || [];
+    const toolsChapter = chapters.find((chapter: any) => chapter.anchor === 'tools');
+    const alreadyHasFlour = toolsChapter?.lessons?.some((lesson: any) => lesson.title === '面粉');
+    if (publishedBread && toolsChapter && !alreadyHasFlour) {
+      const serializeLesson = (lesson: any) => ({
+        title: lesson.title,
+        description: lesson.description,
+        ...(lesson.image ? { image: lesson.image.id } : {}),
+        steps: (lesson.steps || []).map((step: any) => ({ value: step.value })),
+        safetyNote: lesson.safetyNote || '',
+      });
+      const flourLesson = breadTutorialChapters.find(chapter => chapter.anchor === 'tools')!.lessons[2];
+      const updatedChapters = chapters.map((chapter: any) => ({
+        anchor: chapter.anchor,
+        eyebrow: chapter.eyebrow || '',
+        title: chapter.title,
+        summary: chapter.anchor === 'tools' && chapter.summary === '认识擀面杖和切面刀，先学会安全、轻柔地使用工具，再开始塑造面团。'
+          ? '认识擀面杖、切面刀和面粉的正确用法，先学会安全、轻柔地使用工具，再开始塑造面团。'
+          : chapter.summary || '',
+        ...(chapter.image ? { image: chapter.image.id } : {}),
+        lessons: [...(chapter.lessons || []).map(serializeLesson), ...(chapter.anchor === 'tools' ? [flourLesson] : [])],
+      }));
+      await tutorialDocuments.update({
+        documentId: publishedBread.documentId,
+        data: { tutorialChapters: updatedChapters } as any,
+        status: 'published',
+      });
+    }
+    await migrationStore.set({ key: 'diy-promotion-migration-version', value: 10 });
   }
 }
