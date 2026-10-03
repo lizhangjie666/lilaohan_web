@@ -12,6 +12,7 @@ const blocks = computed(() => mergePageSections(sectionList.value, ['diy-detail.
 const tutorial = computed(() => list.value?.find(item => item.slug === route.params.slug))
 if (!tutorial.value) throw createError({ statusCode: 404, statusMessage: '没有找到这份教程' })
 const hasChapters = computed(() => (tutorial.value?.tutorialChapters.length || 0) > 0)
+const guestGalleryExpanded = ref(false)
 if (tutorial.value.experienceStatus === '内容筹备中' || (!tutorial.value.steps.length && !tutorial.value.tutorialChapters.length)) {
   throw createError({ statusCode: 404, statusMessage: '教程尚未发布' })
 }
@@ -48,6 +49,15 @@ const { handleBooking } = useBooking()
       </div></nav>
       <section v-for="(chapter, chapterIndex) in tutorial.tutorialChapters" :id="chapter.anchor" :key="chapter.anchor" class="scroll-mt-24 py-16 md:py-24" :class="chapter.anchor === 'oven' ? 'bg-[#2c241f] text-flour' : chapter.anchor === 'tools' ? 'bg-[#ead7b8]' : 'bg-[#fff8e9]'">
         <div class="page-wrap"><div class="grid gap-8 lg:grid-cols-[.72fr_1.28fr] lg:items-end"><div><p class="eyebrow" :class="chapter.anchor === 'oven' ? 'text-[#f39a72]' : 'text-fire'">{{ chapter.eyebrow }}</p><p class="mt-5 font-serif text-7xl opacity-15">0{{ chapterIndex + 1 }}</p></div><div><h2 class="font-serif text-4xl font-semibold leading-tight md:text-6xl">{{ chapter.title }}</h2><p class="mt-5 max-w-3xl text-lg leading-9" :class="chapter.anchor === 'oven' ? 'text-flour/65' : 'text-charcoal'">{{ chapter.summary }}</p></div></div>
+          <div v-if="chapter.anchor === 'shaping' && chapter.guestCreations?.length" class="mt-12 rounded-[2rem] border border-ink/10 bg-white/80 p-5 md:p-8">
+            <div class="mb-6"><p class="eyebrow text-fire">GUEST CREATIONS</p><h3 class="mt-2 font-serif text-2xl font-semibold md:text-3xl">看看大家做的面包</h3><p class="mt-2 text-sm leading-6 text-charcoal">每一只面包，都有自己的样子。点击照片可放大查看。</p></div>
+            <div class="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5">
+              <figure v-for="(image, index) in (guestGalleryExpanded ? chapter.guestCreations : chapter.guestCreations.slice(0, 6))" :key="`${image.original || image.src}-${index}`" class="min-w-0 rounded-2xl bg-[#f3e5cc] p-2">
+                <ZoomableContentImage :image="image" :alt="image.alt || `客人制作的面包作品 ${index + 1}`" sizes="(min-width: 768px) 30vw, 48vw" image-class="aspect-[4/3] w-full object-contain" />
+              </figure>
+            </div>
+            <button v-if="chapter.guestCreations.length > 6" type="button" class="mt-6 rounded-full border border-ink/20 px-6 py-3 text-sm font-semibold transition hover:border-fire hover:text-fire focus-visible:outline focus-visible:outline-2 focus-visible:outline-fire" :aria-expanded="guestGalleryExpanded" @click="guestGalleryExpanded = !guestGalleryExpanded">{{ guestGalleryExpanded ? '收起作品' : `查看更多作品（共 ${chapter.guestCreations.length} 张）` }}</button>
+          </div>
           <div class="mt-12 grid gap-5" :class="chapter.anchor === 'shaping' ? 'md:grid-cols-2 xl:grid-cols-3' : 'md:grid-cols-2'">
             <article v-for="(lesson, lessonIndex) in chapter.lessons" :key="`${chapter.anchor}-${lesson.title}`" class="overflow-hidden rounded-[2rem] border p-6 md:p-8" :class="chapter.anchor === 'oven' ? 'border-white/10 bg-white/[.055]' : 'border-ink/10 bg-white'">
               <ZoomableContentImage v-if="lesson.image" :image="lesson.image" :alt="lesson.imageAlt || lesson.title" sizes="(min-width: 1280px) 30vw, (min-width:768px) 50vw, 100vw" image-class="max-h-[30rem] w-full object-contain" class="mb-7" />

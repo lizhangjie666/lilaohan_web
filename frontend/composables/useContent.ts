@@ -175,6 +175,9 @@ function normalizeTutorialChapter(value: RawRecord, mediaBase = ''): TutorialCha
     summary: String(value.summary || ''),
     image: mediaAsset(value.image, mediaBase, `${title || '教程章节'}图片`),
     imageAlt: mediaAlt(value.image) || `${title || '教程章节'}图片`,
+    guestCreations: (Array.isArray(value.guestCreations?.data) ? value.guestCreations.data : Array.isArray(value.guestCreations) ? value.guestCreations : [])
+      .map((image: RawRecord) => mediaAsset(image, mediaBase, '客人制作的面包'))
+      .filter((image: ImageAsset | undefined): image is ImageAsset => Boolean(image)),
     lessons: Array.isArray(value.lessons) ? value.lessons.map((lesson: RawRecord) => normalizeTutorialLesson(lesson, mediaBase)) : [],
   }
 }
@@ -396,7 +399,7 @@ export function useContent() {
       'diy-tutorials',
       entity => normalizeTutorial(entity, mediaBase),
       fallbackTutorials,
-      'populate[image]=true&populate[materials]=true&populate[notes]=true&populate[steps][populate][image]=true&populate[ingredients][populate][image]=true&populate[tools][populate][image]=true&populate[tutorialChapters][populate][image]=true&populate[tutorialChapters][populate][lessons][populate][image]=true&populate[tutorialChapters][populate][lessons][populate][steps]=true',
+      'populate[image]=true&populate[materials]=true&populate[notes]=true&populate[steps][populate][image]=true&populate[ingredients][populate][image]=true&populate[tools][populate][image]=true&populate[tutorialChapters][populate][image]=true&populate[tutorialChapters][populate][guestCreations]=true&populate[tutorialChapters][populate][lessons][populate][image]=true&populate[tutorialChapters][populate][lessons][populate][steps]=true',
     ),
     diySettings: () => getSingle('diy-setting', normalizeDiySetting, defaultDiySetting),
     spots: () => getCollection('photo-spots', entity => normalizeSpot(entity, mediaBase), fallbackSpots),

@@ -54,6 +54,7 @@ export interface TutorialChapter {
   summary: string
   image?: ImageSource
   imageAlt: string
+  guestCreations?: ImageAsset[]
   lessons: TutorialLesson[]
 }
 

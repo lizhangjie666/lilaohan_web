@@ -191,6 +191,7 @@ const componentLocalizations: Record<string, ModelLocalization> = {
     title: { label: '章节标题' },
     summary: { label: '章节简介' },
     image: { label: '章节封面图片' },
+    guestCreations: { label: '往期客人面包作品', description: '仅在面包造型篇展示。上传已获公开展示许可的照片；可调整顺序，发布教程后更新官网。' },
     lessons: { label: '课程小项' },
   },
   'diy.lesson': {
